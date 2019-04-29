@@ -147,8 +147,6 @@ export class ScatterGL extends Mark {
             },
             vertexShader: require('raw-loader!../shaders/scatter-vertex.glsl'),
             fragmentShader: require('raw-loader!../shaders/scatter-fragment.glsl'),
-            // side: THREE.Both,
-            alphaTest: 0.01, // don't render almost fully transparant objects
             transparent: true,
             depthTest: false,
             depthWrite: false,
