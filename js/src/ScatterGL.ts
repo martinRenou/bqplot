@@ -52,6 +52,7 @@ const create_colormap = function(scale) {
     const colormap_arr = new Uint8Array(colormap_array);
     const colormap_texture = new THREE.DataTexture(colormap_arr, N, 1, THREE.RGBFormat, THREE.UnsignedByteType);
     colormap_texture.needsUpdate = true;
+
     return colormap_texture;
 }
 
@@ -531,7 +532,22 @@ export class ScatterGL extends Mark {
         const range_y = this.parent.padded_range("y", y_scale.model);
 
         this.scatter_material.uniforms['colormap'].value = create_colormap(this.scales.color)
-        this.scatter_material.uniforms['domain_color'].value = [this.scales.color.model.min, this.scales.color.model.max];
+        if(this.scales.color) {
+            const color = this.model.get('color');
+            let min;
+            let max;
+            if(this.scales.color.model.min !== null) {
+                min = this.scales.color.model.min;
+            } else {
+                min = Math.min(...color);
+            }
+            if(this.scales.color.model.max !== null) {
+                max = this.scales.color.model.max;
+            } else {
+                max = Math.max(...color);
+            }
+            this.scatter_material.uniforms['domain_color'].value = [min, max];
+        }
 
         _.each(['selected', 'hovered'], (style_type) => {
             _.each(['stroke', 'fill', 'opacity'], (style_property) => {
