@@ -11,12 +11,6 @@ varying vec2 vertex_uv;
 varying vec2 vUv;
 varying float pixel_size;
 
-uniform sampler2D texture;
-#ifdef USE_TEXTURE
-uniform sampler2D texture_previous;
-uniform float animation_time_texture;
-#endif
-
 uniform bool fill;
 uniform float stroke_width;
 
@@ -52,8 +46,8 @@ void main(void) {
         float stroke_weight_inverse = smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.x) - pixel_size/2.0 + stroke_width/2.0))
                                     * smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.y) - pixel_size/2.0 + stroke_width/2.0));
         float stroke_weight = 1.0 - stroke_weight_inverse;
-        float fill_weight =  1.0*     smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.x) - pixel_size/2.0 + stroke_width/2.0))
-                                    * smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.y) - pixel_size/2.0 + stroke_width/2.0));
+        float fill_weight =  1.0 * smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.x) - pixel_size/2.0 + stroke_width/2.0))
+                                 * smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.y) - pixel_size/2.0 + stroke_width/2.0));
         fill_weight *= (fill ? 1.0 : 0.0);
         vec4 color = fill_color * fill_weight + stroke_color * stroke_weight;
         color.a = fill_color.a * fill_weight + stroke_color.a * stroke_weight;
@@ -70,8 +64,8 @@ void main(void) {
         float bottom_width = tan(angle) * pixel_size;
         float edge_weight_bottom = (1.0 - smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, abs(pixel.y + pixel_size/2.0) - stroke_width/2.0))
                                  * (1.0 - smoothstep(bottom_width - SMOOTH_PIXELS, bottom_width + SMOOTH_PIXELS, abs(pixel.x)));
-        float edge_weight_left  = (1.0 - smoothstep(- SMOOTH_PIXELS, + SMOOTH_PIXELS, abs(pixel_left.x) - stroke_width/2.0));
-        float edge_weight_right = (1.0 - smoothstep(- SMOOTH_PIXELS, + SMOOTH_PIXELS, abs(pixel_right.x) - stroke_width/2.0));
+        float edge_weight_left  = (1.0 - smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, abs(pixel_left.x) - stroke_width/2.0));
+        float edge_weight_right = (1.0 - smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, abs(pixel_right.x) - stroke_width/2.0));
 
         float fill_weight = smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, pixel.y + pixel_size/2.0 - stroke_width/2.)
                           * smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, pixel_left.x  - stroke_width/2.)
@@ -83,13 +77,7 @@ void main(void) {
         color.a = fill_color.a * fill_weight + stroke_color.a * stroke_weight;
         gl_FragColor = color;
     #else
-        vec4 weights = texture2D(texture, vUv);
-        // we use weights.r for the fill weight, and weights.g for the stroke weights
-        // we also use the stroke weight as alpha blending, so we don't add fill and stroke
-        // colors together, but blend them
-        float alpha = weights.g;
-        gl_FragColor   = mix(fill_color   * weights.r, stroke_color, alpha);
-        gl_FragColor.a = mix(fill_color.a * weights.r, stroke_color.a, alpha);
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     #endif
 #ifdef ALPHATEST
  if ( gl_FragColor.a < ALPHATEST ) discard;

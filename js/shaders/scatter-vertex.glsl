@@ -185,7 +185,6 @@ void main(void) {
     fill_color.a *= opacity_value;
     stroke_color.a *= opacity_value;
 
-
     if(has_selection) {
         if(has_selected_fill && selected > 0.5 )
             fill_color = selected_fill;
@@ -203,8 +202,8 @@ void main(void) {
             stroke_color.a *= unselected_opacity;
             fill_color.a *= unselected_opacity;
         }
-
     }
+
     fill_color.rgb *= fill_color.a;
     stroke_color.rgb *= stroke_color.a;
 

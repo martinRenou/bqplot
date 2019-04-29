@@ -141,7 +141,6 @@ export class ScatterGL extends Mark {
                 stroke_color_default: {type: "4f", value: [0, 0, 0, 0]},
 
                 colormap: { type: 't', value: null },
-                texture: { type: 't', value: null },
                 fill: {type: 'b', value: true },
                 stroke_width: {type: 'f', value: 1.5 },
                 marker_scale: {type: 'f', value: 1.0 }
@@ -170,77 +169,11 @@ export class ScatterGL extends Mark {
         this.marker_plane = new THREE.PlaneGeometry();
         // this.geo_triangle_2d = new THREE.CircleGeometry(1, 3, Math.PI/2);
 
-        this.canvas_markers = {}
-        this.canvas_textures = {}
-
-        const width = 64, height = 64;
-
-        let canvas_marker;
-        canvas_marker = this.canvas_markers.circle = document.createElement('canvas');
-        canvas_marker.width  = width;
-        canvas_marker.height = height;
-
-        let ctx = canvas_marker.getContext('2d');
-        ctx.lineWidth = 1.0;
-        ctx.strokeStyle = 'rgba(0, 255, 0, 1.0)';
-        ctx.fillStyle = 'rgba(255, 0, 0, 1.0)';
-
-        ctx.translate(0.5, 0.5);
-        ctx.beginPath();
-        let dx = width/4;
-        let dy = height/4;
-        let r = Math.sqrt(dx*dx + dy*dy)
-        ctx.arc(width/2, height/2, r, 0, 2*Math.PI);
-        ctx.fill()
-        ctx.stroke()
-
-        canvas_marker = this.canvas_markers.arrow = document.createElement('canvas');
-        canvas_marker.width  = width;
-        canvas_marker.height = height;
-
-        ctx = canvas_marker.getContext('2d');
-        ctx.lineWidth = 1.0;
-        ctx.strokeStyle = 'rgba(0, 255, 0, 1.0)';
-        ctx.fillStyle = 'rgba(255, 0, 0, 1.0)';
-
-        ctx.moveTo(width/2, 0);
-        ctx.lineTo(width/2, height);
-
-        ctx.moveTo(width/2-width/4, height/4);
-        ctx.lineTo(width/2, 0);
-        ctx.lineTo(width/2+width/4, height/4);
-
-        ctx.fill()
-        ctx.stroke()
-
-        canvas_marker = this.canvas_markers.square = document.createElement('canvas');
-        canvas_marker.width  = width;
-        canvas_marker.height = height;
-
-        ctx = canvas_marker.getContext('2d');
-        ctx.lineWidth = 1.0;
-        ctx.strokeStyle = 'rgba(0, 255, 0, 1.0)';
-        ctx.fillStyle = 'rgba(255, 0, 0, 1.0)';
-
-        ctx.moveTo(0, 0);
-        ctx.rect(0, 0, width, height);
-        ctx.fill()
-        ctx.stroke()
-
-        this.canvas_textures.circle = new THREE.CanvasTexture(this.canvas_markers.circle)
-        this.canvas_textures.arrow = new THREE.CanvasTexture(this.canvas_markers.arrow)
-        this.canvas_textures.square = new THREE.CanvasTexture(this.canvas_markers.square)
-        // canvas is always pre-multipled https://github.com/mrdoob/three.js/issues/1864
-        this.canvas_textures.circle.premultiplyAlpha = true;
-        this.canvas_textures.arrow.premultiplyAlpha = true;
-        this.canvas_textures.square.premultiplyAlpha = true;
-
         const marker_geometry = this.marker_plane;
         this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(marker_geometry);
         this.marker_scale = 1;
         const sync_marker = () => {
             this.dot.type(this.model.get("marker"))
-            this.scatter_material.uniforms['texture'].value = this.canvas_textures[this.model.get('marker')]
             this.scatter_material.defines['FAST_DRAW'] = 0;
             const marker = this.model.get('marker');
             let scale = 1;
@@ -267,8 +200,6 @@ export class ScatterGL extends Mark {
         }
         sync_marker()
         this.listenTo(this.model, 'change:marker', sync_marker)
-
-        // marker_plane.scale(scale, scale, scale)
 
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -10000, 10000 );
@@ -595,11 +526,7 @@ export class ScatterGL extends Mark {
         }
 
         const renderer = fig.renderer;
-        // const image = this.model.get("image");
         renderer.render(this.scene, this.camera);
-        // const canvas = renderer.domElement;
-        // const url = canvas.toDataURL('image/png');
-        // this.im.attr("href", url);
 
         const transitions_todo = []
         for(let i = 0; i < this.transitions.length; i++) {
@@ -981,8 +908,6 @@ export class ScatterGL extends Mark {
     mesh: any;
     instanced_geometry: any;
     buffer_marker_geometry: any;
-    canvas_markers: any;
-    canvas_textures: any;
     im: any;
     marker_scale: any;
     marker_plane: any;
