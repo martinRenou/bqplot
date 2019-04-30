@@ -597,6 +597,7 @@ export class ScatterGL extends Mark {
             } else {
                 this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
             }
+            this.scatter_material.needsUpdate = true;
             this.update_scene();
         }
         this.listenTo(this.model, "change:stroke", sync_stroke);
