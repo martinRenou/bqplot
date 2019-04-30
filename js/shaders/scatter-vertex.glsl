@@ -76,7 +76,7 @@ varying vec4 stroke_color;
 varying vec3 vertex_position;
 varying vec2 vertex_uv;
 varying vec2 vUv;
-varying float pixel_size;
+varying float marker_size;
 
 // #ifdef AS_LINE
 // attribute vec3 position_previous;
@@ -152,9 +152,9 @@ void main(void) {
 
 
     // times 4 because of the normalized coordinates, and radius vs diameter use
-    pixel_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
+    marker_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
     // we draw larger than the size for the stroke_width (on both side)
-    float s = pixel_size + 2.0 * stroke_width;
+    float s = marker_size + 2.0 * stroke_width;
     vUv = uv;
     float angle = SCALE_ROTATION(mix(rotation_previous, rotation, animation_time_rotation));
     vec3 model_pos = rotate_xy(position, 1.) * s + center_pixels;
