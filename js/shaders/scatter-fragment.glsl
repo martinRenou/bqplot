@@ -38,6 +38,23 @@ float circle(in float radius, in float dist) {
     return 1.0 - smoothstep(radius - SMOOTH_PIXELS, radius + SMOOTH_PIXELS, dist);
 }
 
+/*
+ * Returns 1.0 if pixel inside of a rectangle (0.0 otherwise) given the rectangle half-size
+ * on the x and y axes and the pixel position.
+ */
+float rectangle(in vec2 size, in vec2 pixel_position) {
+    vec2 rec = smoothstep(vec2(-SMOOTH_PIXELS), vec2(SMOOTH_PIXELS), size - abs(pixel_position));
+    return rec.x * rec.y;
+}
+
+/*
+ * Returns 1.0 if pixel inside of a square (0.0 otherwise) given the square half-size
+ * and the pixel position.
+ */
+float square(in float size, in vec2 pixel_position) {
+    return rectangle(vec2(size), pixel_position);
+}
+
 
 void main(void) {
     vec2 pixel = (vUv - 0.5) * (marker_size + 2.0 * stroke_width);
@@ -59,13 +76,11 @@ void main(void) {
     stroke_weight = (1.0 - inner_circle) * outer_circle;
 
 #elif FAST_DRAW == FAST_SQUARE
-    if (fill) {
-        fill_weight =  smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.x) - marker_size/2.0 + stroke_width/2.0)) *
-                       smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.y) - marker_size/2.0 + stroke_width/2.0));
-    }
+    float inner_square_size = marker_size/2.0 - stroke_width/2.0;
 
-    stroke_weight = 1.0 - smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.x) - marker_size/2.0 + stroke_width/2.0)) *
-                          smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, -(abs(pixel.y) - marker_size/2.0 + stroke_width/2.0));
+    fill_weight = square(inner_square_size, pixel);
+
+    stroke_weight = 1.0 - fill_weight;
 
 #elif FAST_DRAW == FAST_ARROW
     // take 2 rotated coordinate systems
