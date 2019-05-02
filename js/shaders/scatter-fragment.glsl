@@ -57,6 +57,9 @@ float square(in float size, in vec2 pixel_position) {
 
 
 void main(void) {
+    // pixel is the pixel position relatively to the marker,
+    // e.g. vec2(0.) would be the center of the marker
+    // e.g. vec2(marker_size + 2.0 * stroke_width) would be the top-right pixel of the marker
     vec2 pixel = (vUv - 0.5) * (marker_size + 2.0 * stroke_width);
     float fill_weight = 0.0;
     float stroke_weight = 0.0;
