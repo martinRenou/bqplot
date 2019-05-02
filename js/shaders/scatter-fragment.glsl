@@ -35,10 +35,13 @@ vec2 rotate_xy(vec2 x, float angle) {
 
 /*
  * Returns 1.0 if pixel inside of a circle (0.0 otherwise) given the circle radius and the
- * pixel distance from the circle center.
+ * pixel position.
  */
-float circle(in float radius, in float dist) {
-    return 1.0 - smoothstep(radius - SMOOTH_PIXELS, radius + SMOOTH_PIXELS, dist);
+float circle(in float radius, in vec2 pixel_position) {
+    float d = pow(pixel_position.x, 2.0) + pow(pixel_position.y, 2.0);
+    float r1 = pow(radius - SMOOTH_PIXELS, 2.0);
+    float r2 = pow(radius + SMOOTH_PIXELS, 2.0);
+    return 1.0 - smoothstep(r1, r2, d);
 }
 
 /*
@@ -79,15 +82,11 @@ void main(void) {
     // - `A * B`   -> A AND B
 
 #if FAST_DRAW == FAST_CIRCLE
-    // `dist` is the distance from the marker center
-    // This uses `sqrt` which is slow, there might be room for performance improvements, can we achieve the same pixel-perfect result without sqrt?
-    float dist = length(pixel);
-
     float inner_radius = marker_size/2.0 - stroke_width;
     float outer_radius = marker_size/2.0 + stroke_width;
 
-    float inner_circle = circle(inner_radius, dist);
-    float outer_circle = circle(outer_radius, dist);
+    float inner_circle = circle(inner_radius, pixel);
+    float outer_circle = circle(outer_radius, pixel);
 
     fill_weight = inner_circle;
     stroke_weight = (1.0 - inner_circle) * outer_circle;
