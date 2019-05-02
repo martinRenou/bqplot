@@ -61,8 +61,19 @@ void main(void) {
     // e.g. vec2(0.) would be the center of the marker
     // e.g. vec2(marker_size + 2.0 * stroke_width) would be the top-right pixel of the marker
     vec2 pixel = (vUv - 0.5) * (marker_size + 2.0 * stroke_width);
+
+    // fill_weight and stroke_weight are color factors
+    // e.g. if fill_weight == 1.0 then the pixel color will be fill_color
+    // e.g. if stroke_weight == 1.0 then the pixel color will be stroke_color
     float fill_weight = 0.0;
     float stroke_weight = 0.0;
+
+    // Note for the reader: In the following code,
+    // - `1.0`     -> True
+    // - `0.0`     -> False
+    // - `1.0 - A` -> NOT A
+    // - `A + B`   -> A OR B
+    // - `A * B`   -> A AND B
 
 #if FAST_DRAW == FAST_CIRCLE
     // `dist` is the distance from the marker center
