@@ -10,6 +10,7 @@ precision highp int;
 #define FAST_SQUARE 2
 #define FAST_ARROW 3
 
+// This parameter is used for reducing aliasing
 #define SMOOTH_PIXELS 1.0
 
 varying vec4 fill_color;
@@ -38,9 +39,25 @@ vec2 rotate_xy(vec2 x, float angle) {
  * pixel position.
  */
 float circle(in float radius, in vec2 pixel_position) {
+    // This function does not use the ellipse function for optimization purpose
+    // Circle equation: x^2 + y^2 = radius^2
     float d = pow(pixel_position.x, 2.0) + pow(pixel_position.y, 2.0);
     float r1 = pow(radius - SMOOTH_PIXELS, 2.0);
     float r2 = pow(radius + SMOOTH_PIXELS, 2.0);
+    return 1.0 - smoothstep(r1, r2, d);
+}
+
+/*
+ * Returns 1.0 if pixel inside of an ellipse (0.0 otherwise) given the ellipse radius and the
+ * pixel position.
+ */
+float ellipse(in float a, in float b, in vec2 pixel_position) {
+    // Ellipse equation: b^2 * x^2 + a^2 * y^2 = a^2 * b^2
+    float r_x = pow(a, 2.0);
+    float r_y = pow(b, 2.0);
+    float d = r_y * pow(pixel_position.x, 2.0) + r_x * pow(pixel_position.y, 2.0);
+    float r1 = pow(a - SMOOTH_PIXELS, 2.0) * pow(b - SMOOTH_PIXELS, 2.0);
+    float r2 = pow(a + SMOOTH_PIXELS, 2.0) * pow(b + SMOOTH_PIXELS, 2.0);
     return 1.0 - smoothstep(r1, r2, d);
 }
 
