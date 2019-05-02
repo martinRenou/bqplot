@@ -83,8 +83,8 @@ void main(void) {
     // This uses `sqrt` which is slow, there might be room for performance improvements, can we achieve the same pixel-perfect result without sqrt?
     float dist = length(pixel);
 
-    float inner_radius = marker_size/2.0 - stroke_width/2.0;
-    float outer_radius = marker_size/2.0 + stroke_width/2.0;
+    float inner_radius = marker_size/2.0 - stroke_width;
+    float outer_radius = marker_size/2.0 + stroke_width;
 
     float inner_circle = circle(inner_radius, dist);
     float outer_circle = circle(outer_radius, dist);
@@ -93,7 +93,7 @@ void main(void) {
     stroke_weight = (1.0 - inner_circle) * outer_circle;
 
 #elif FAST_DRAW == FAST_SQUARE
-    float inner_square_size = marker_size/2.0 - stroke_width/2.0;
+    float inner_square_size = marker_size/2.0 - stroke_width;
 
     fill_weight = square(inner_square_size, pixel);
 
