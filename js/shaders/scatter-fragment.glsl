@@ -23,6 +23,9 @@ uniform bool fill;
 uniform float stroke_width;
 
 
+/*
+ * Rotate a point in the 2-D plane, given an angle in radians
+ */
 vec2 rotate_xy(vec2 x, float angle) {
     float sina = sin(angle);
     float cosa = cos(angle);
