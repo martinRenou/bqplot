@@ -163,35 +163,28 @@ export class ScatterGL extends Mark {
             blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
         });
 
-        this.geo_circle_2d = new THREE.CircleGeometry(0.5, 32, Math.PI/2);
-        this.marker_plane = new THREE.PlaneGeometry();
-        // this.geo_triangle_2d = new THREE.CircleGeometry(1, 3, Math.PI/2);
-
-        const marker_geometry = this.marker_plane;
-        this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(marker_geometry);
+        this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(new THREE.PlaneGeometry());
         this.marker_scale = 1;
         const sync_marker = () => {
             this.dot.type(this.model.get("marker"))
             this.scatter_material.defines['FAST_DRAW'] = 0;
             const marker = this.model.get('marker');
-            let scale = 1;
             const FAST_CIRCLE = 1;
             const FAST_SQUARE = 2;
             const FAST_ARROW = 3;
             if(marker === 'circle') {
                 // same as in ./Markers.js
-                scale = 1/Math.sqrt(Math.PI);
+                this.marker_scale = 1/Math.sqrt(Math.PI);
                 this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
             }
             if(marker === 'square') {
-                scale = 1/2.;
+                this.marker_scale = 1/2.;
                 this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
             }
             if(marker === 'arrow') {
-                scale = 2;
+                this.marker_scale = 2;
                 this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
             }
-            this.marker_scale = scale;
             this.scatter_material.needsUpdate = true;
             if(this.mesh) // otherwise someone will call it later on
                 this.update_geometry()
@@ -898,7 +891,6 @@ export class ScatterGL extends Mark {
     y_scale: any;
     pixel_x: any;
     pixel_y: any;
-    geo_circle_2d: any;
     trottled_selector_changed: any;
     invalidated_pixel_position: any;
     scatter_material: any;
