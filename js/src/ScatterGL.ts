@@ -516,6 +516,8 @@ export class ScatterGL extends Mark {
         });
         this.listenTo(this.model, 'change:marker', this.update_marker);
         this.update_marker();
+        this.listenTo(this.model, 'change:stroke', this.update_stroke);
+        this.update_stroke();
         this.listenTo(this.model, "change:rotation", () => {
             this.push_array('rotation');
             this.update_geometry(['rotation', 'size'], [() => this.push_array('rotation')]);
@@ -557,28 +559,13 @@ export class ScatterGL extends Mark {
         this.listenTo(this.model, "change:stroke_width", sync_stroke_width);
         sync_stroke_width();
 
-        const sync_stroke = () => {
-            if(this.model.get('stroke')) {
-                this.scatter_material.uniforms.stroke_color_default.value = color_to_array_rgba(this.model.get('stroke'));
-                this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = true;
-            } else {
-                this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
-            }
-            this.scatter_material.needsUpdate = true;
-            this.update_scene();
-        }
-        this.listenTo(this.model, "change:stroke", sync_stroke);
-        sync_stroke();
-
         this.listenTo(this.model, "change", this.update_legend);
 
         // many things to implement still
-        // this.listenTo(this.model, "change:stroke", this.update_stroke);
         // this.listenTo(this.model, "change:stroke_width", this.update_stroke_width);
         // this.listenTo(this.model, "change:default_opacities", this.update_default_opacities);
         // this.listenTo(this.model, "change:default_skew", this.update_default_skew);
         // this.listenTo(this.model, "change:default_rotation", this.update_xy_position);
-        // this.listenTo(this.model, "change:marker", this.update_marker);
         // this.listenTo(this.model, "change:fill", this.update_fill);
         // this.listenTo(this.model, "change:display_names", this.update_names);
     }
@@ -603,6 +590,20 @@ export class ScatterGL extends Mark {
         if(marker === 'arrow') {
             this.scatter_material.uniforms.marker_scale.value = 2.;
             this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
+        }
+
+        this.scatter_material.needsUpdate = true;
+        this.update_scene();
+    }
+
+    update_stroke() {
+        const stroke = this.model.get('stroke');
+
+        if(stroke) {
+            this.scatter_material.uniforms.stroke_color_default.value = color_to_array_rgba(stroke);
+            this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = true;
+        } else {
+            this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
         }
 
         this.scatter_material.needsUpdate = true;
