@@ -518,6 +518,8 @@ export class ScatterGL extends Mark {
         this.update_marker();
         this.listenTo(this.model, 'change:stroke', this.update_stroke);
         this.update_stroke();
+        this.listenTo(this.model, 'change:stroke_width', this.update_stroke_width);
+        this.update_stroke_width();
         this.listenTo(this.model, "change:rotation", () => {
             this.push_array('rotation');
             this.update_geometry(['rotation', 'size'], [() => this.push_array('rotation')]);
@@ -552,17 +554,9 @@ export class ScatterGL extends Mark {
         this.listenTo(this.model, "change:fill", sync_fill);
         sync_fill();
 
-        const sync_stroke_width = () => {
-            this.scatter_material.uniforms.stroke_width.value = this.model.get('stroke_width');
-            this.update_geometry();
-        }
-        this.listenTo(this.model, "change:stroke_width", sync_stroke_width);
-        sync_stroke_width();
-
         this.listenTo(this.model, "change", this.update_legend);
 
         // many things to implement still
-        // this.listenTo(this.model, "change:stroke_width", this.update_stroke_width);
         // this.listenTo(this.model, "change:default_opacities", this.update_default_opacities);
         // this.listenTo(this.model, "change:default_skew", this.update_default_skew);
         // this.listenTo(this.model, "change:default_rotation", this.update_xy_position);
@@ -607,6 +601,11 @@ export class ScatterGL extends Mark {
         }
 
         this.scatter_material.needsUpdate = true;
+        this.update_scene();
+    }
+
+    update_stroke_width() {
+        this.scatter_material.uniforms.stroke_width.value = this.model.get('stroke_width');
         this.update_scene();
     }
 
