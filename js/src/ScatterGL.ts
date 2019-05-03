@@ -425,24 +425,6 @@ export class ScatterGL extends Mark {
         const range_x = this.parent.padded_range("x", x_scale.model);
         const range_y = this.parent.padded_range("y", y_scale.model);
 
-        this.scatter_material.uniforms['colormap'].value = create_colormap(this.scales.color)
-        if(this.scales.color) {
-            const color = this.model.get('color');
-            let min;
-            let max;
-            if(this.scales.color.model.min !== null) {
-                min = this.scales.color.model.min;
-            } else {
-                min = Math.min(...color);
-            }
-            if(this.scales.color.model.max !== null) {
-                max = this.scales.color.model.max;
-            } else {
-                max = Math.max(...color);
-            }
-            this.scatter_material.uniforms['domain_color'].value = [min, max];
-        }
-
         _.each(['selected', 'hovered'], (style_type) => {
             _.each(['stroke', 'fill', 'opacity'], (style_property) => {
                 this.scatter_material.uniforms[`has_${style_type}_${style_property}`].value   = Boolean(this.model.get(`${style_type}_style`)[style_property])
@@ -609,6 +591,29 @@ export class ScatterGL extends Mark {
         this.update_scene();
     }
 
+    update_color_map() {
+        this.scatter_material.uniforms['colormap'].value = create_colormap(this.scales.color)
+
+        if(this.scales.color) {
+            const color = this.model.get('color');
+            let min;
+            let max;
+            if(this.scales.color.model.min !== null) {
+                min = this.scales.color.model.min;
+            } else {
+                min = Math.min(...color);
+            }
+            if(this.scales.color.model.max !== null) {
+                max = this.scales.color.model.max;
+            } else {
+                max = Math.max(...color);
+            }
+            this.scatter_material.uniforms['domain_color'].value = [min, max];
+        }
+
+        this.update_scene();
+    }
+
     update_position(animate?) {
         this.update_scene();
         this.invalidate_pixel_position();
@@ -704,12 +709,8 @@ export class ScatterGL extends Mark {
         // the following handlers are for changes in data that does not
         // impact the position of the elements
         if (color_scale) {
-            this.listenTo(color_scale, "domain_changed", () => {
-                this.update_scene();
-            });
-            color_scale.on("color_scale_range_changed", () => {
-                this.update_scene();
-            });
+            this.listenTo(color_scale, 'all', this.update_color_map);
+            this.update_color_map();
         }
         if (size_scale) {
             this.listenTo(size_scale, "domain_changed", () => {
