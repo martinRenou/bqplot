@@ -164,10 +164,6 @@ export class ScatterGL extends Mark {
         });
 
         this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(new THREE.PlaneGeometry());
-        this.marker_scale = 1;
-
-        this.on_marker_change();
-        this.listenTo(this.model, 'change:marker', this.on_marker_change);
 
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -10000, 10000 );
@@ -197,30 +193,6 @@ export class ScatterGL extends Mark {
             });
         });
         return base_render_promise;
-    }
-
-    on_marker_change() {
-        const marker = this.model.get('marker');
-        this.dot.type(marker);
-        const FAST_CIRCLE = 1;
-        const FAST_SQUARE = 2;
-        const FAST_ARROW = 3;
-        if(marker === 'circle') {
-            // same as in ./Markers.js
-            this.marker_scale = 1/Math.sqrt(Math.PI);
-            this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
-        }
-        if(marker === 'square') {
-            this.marker_scale = 1/2.;
-            this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
-        }
-        if(marker === 'arrow') {
-            this.marker_scale = 2;
-            this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
-        }
-        this.scatter_material.needsUpdate = true;
-        if(this.mesh) // otherwise someone will call it later on
-            this.update_geometry();
     }
 
     push_size() {
@@ -378,7 +350,6 @@ export class ScatterGL extends Mark {
         this.instanced_geometry = new THREE.InstancedBufferGeometry();
         const vertices = this.buffer_marker_geometry.attributes.position.clone();
         this.instanced_geometry.addAttribute('position', vertices);
-        this.scatter_material.uniforms.marker_scale.value = this.marker_scale;
 
         const uv = this.buffer_marker_geometry.attributes.uv.clone();
         this.instanced_geometry.addAttribute('uv', uv);
@@ -543,6 +514,8 @@ export class ScatterGL extends Mark {
             this.push_array('y');
             this.update_geometry(['y', 'size'], [() => this.push_array('y')]);
         });
+        this.listenTo(this.model, 'change:marker', this.update_marker);
+        this.update_marker();
         this.listenTo(this.model, "change:rotation", () => {
             this.push_array('rotation');
             this.update_geometry(['rotation', 'size'], [() => this.push_array('rotation')]);
@@ -608,6 +581,32 @@ export class ScatterGL extends Mark {
         // this.listenTo(this.model, "change:marker", this.update_marker);
         // this.listenTo(this.model, "change:fill", this.update_fill);
         // this.listenTo(this.model, "change:display_names", this.update_names);
+    }
+
+    update_marker() {
+        const FAST_CIRCLE = 1;
+        const FAST_SQUARE = 2;
+        const FAST_ARROW = 3;
+
+        const marker = this.model.get('marker');
+        this.dot.type(marker);
+
+        if(marker === 'circle') {
+            // same as in ./Markers.js
+            this.scatter_material.uniforms.marker_scale.value = 1/Math.sqrt(Math.PI);
+            this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
+        }
+        if(marker === 'square') {
+            this.scatter_material.uniforms.marker_scale.value = 1/2.;
+            this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
+        }
+        if(marker === 'arrow') {
+            this.scatter_material.uniforms.marker_scale.value = 2.;
+            this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
+        }
+
+        this.scatter_material.needsUpdate = true;
+        this.update_scene();
     }
 
     update_position(animate?) {
