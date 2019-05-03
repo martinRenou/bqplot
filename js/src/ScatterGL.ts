@@ -61,17 +61,17 @@ export class ScatterGL extends Mark {
     render() {
         const base_render_promise = super.render();
 
-        this.previous_values = {}
-        this.attributes_changed = {}
-        this.transitions = []
-        this.invalidated_pixel_position = true;;
+        this.previous_values = {};
+        this.attributes_changed = {};
+        this.transitions = [];
+        this.invalidated_pixel_position = true;
         this._update_requested = false;
 
         const el = this.d3el || this.el;
 
         // only used for the legend
         this.dot = bqSymbol()
-            .type(this.model.get("marker"))
+            .type(this.model.get("marker"));
 
         this.im = el.append("image")
             .attr("x", 0)
@@ -82,68 +82,68 @@ export class ScatterGL extends Mark {
 
         this.scatter_material = new THREE.RawShaderMaterial({
             uniforms: {
-                offset: { type: '3f', value: [0, 0, 0] },
-                scale : { type: '3f', value: [1, 1, 1] },
-                domain_x : { type: "2f", value: [0., 10.] },
-                domain_y : { type: "2f", value: [-12., 12.] },
-                domain_z : { type: "2f", value: [0., 1.] },
-                domain_size : { type: "2f", value: [0., 1.] },
-                domain_color : { type: "2f", value: [0., 1.] },
-                domain_rotation  : { type: "2f", value: [0., 180] },
-                domain_opacity   : { type: "2f", value: [0., 1.] },
-                range_x  : { type: "2f", value: [0., 1.] },
-                range_y  : { type: "2f", value: [0., 1.] },
-                range_z  : { type: "2f", value: [0., 1.] },
-                range_size  : { type: "2f", value: [0., 1.] },
-                range_rotation  : { type: "2f", value: [0., Math.PI] },
-                range_opacity  : { type: "2f", value: [0., 1.] },
-                animation_time_x : { type: "f", value: 1. },
-                animation_time_y : { type: "f", value: 1. },
-                animation_time_z : { type: "f", value: 1. },
-                animation_time_vx : { type: "f", value: 1. },
-                animation_time_vy : { type: "f", value: 1. },
-                animation_time_vz : { type: "f", value: 1. },
-                animation_time_size : { type: "f", value: 1. },
-                animation_time_color : { type: "f", value: 1. },
-                animation_time_rotation : { type: "f", value: 1. },
-                animation_time_opacity : { type: "f", value: 1. },
+                offset: {type: '3f', value: [0, 0, 0]},
+                scale: {type: '3f', value: [1, 1, 1]},
+                domain_x: {type: "2f", value: [0., 10.]},
+                domain_y: {type: "2f", value: [-12., 12.]},
+                domain_z: {type: "2f", value: [0., 1.]},
+                domain_size: {type: "2f", value: [0., 1.]},
+                domain_color: {type: "2f", value: [0., 1.]},
+                domain_rotation: {type: "2f", value: [0., 180]},
+                domain_opacity: {type: "2f", value: [0., 1.]},
+                range_x: {type: "2f", value: [0., 1.]},
+                range_y: {type: "2f", value: [0., 1.]},
+                range_z: {type: "2f", value: [0., 1.]},
+                range_size: {type: "2f", value: [0., 1.]},
+                range_rotation: {type: "2f", value: [0., Math.PI]},
+                range_opacity: {type: "2f", value: [0., 1.]},
+                animation_time_x: {type: "f", value: 1.},
+                animation_time_y: {type: "f", value: 1.},
+                animation_time_z: {type: "f", value: 1.},
+                animation_time_vx: {type: "f", value: 1.},
+                animation_time_vy: {type: "f", value: 1.},
+                animation_time_vz: {type: "f", value: 1.},
+                animation_time_size: {type: "f", value: 1.},
+                animation_time_color: {type: "f", value: 1.},
+                animation_time_rotation: {type: "f", value: 1.},
+                animation_time_opacity: {type: "f", value: 1.},
 
-                has_selection : {type: "b", value: false},
-                has_hover     : {type: "b", value: false},
+                has_selection: {type: "b", value: false},
+                has_hover: {type: "b", value: false},
 
-                has_selected_fill    : {type: "b", value: false},
-                has_selected_stroke    : {type: "b", value: false},
-                has_selected_opacity    : {type: "b", value: false},
-                has_unselected_fill  : {type: "b", value: false},
-                has_unselected_stroke  : {type: "b", value: false},
-                has_unselected_opacity  : {type: "b", value: false},
+                has_selected_fill: {type: "b", value: false},
+                has_selected_stroke: {type: "b", value: false},
+                has_selected_opacity: {type: "b", value: false},
+                has_unselected_fill: {type: "b", value: false},
+                has_unselected_stroke: {type: "b", value: false},
+                has_unselected_opacity: {type: "b", value: false},
 
-                has_hovered_fill     : {type: "b", value: false},
-                has_hovered_stroke     : {type: "b", value: false},
-                has_hovered_opacity     : {type: "b", value: false},
-                has_unhovered_fill   : {type: "b", value: false},
-                has_unhovered_stroke   : {type: "b", value: false},
-                has_unhovered_opacity   : {type: "b", value: false},
+                has_hovered_fill: {type: "b", value: false},
+                has_hovered_stroke: {type: "b", value: false},
+                has_hovered_opacity: {type: "b", value: false},
+                has_unhovered_fill: {type: "b", value: false},
+                has_unhovered_stroke: {type: "b", value: false},
+                has_unhovered_opacity: {type: "b", value: false},
 
-                selected_fill      : { type: "4f", value: [1., 0., 0., 1.0] },
-                selected_stroke    : { type: "4f", value: [1., 0., 0., 1.0] },
-                selected_opacity   : {value: 1.0},
-                unselected_fill    : { type: "4f", value: [1., 0., 0., 1.0] },
-                unselected_stroke  : { type: "4f", value: [1., 0., 0., 1.0] },
-                unselected_opacity : {value: 1.0},
-                hovered_fill       : { type: "4f", value: [0., 1., 0., 1.0] },
-                hovered_opacity    : {value: 1.0},
-                hovered_stroke    : { type: "4f", value: [0., 1., 0., 1.0] },
-                unhovered_fill  : { type: "4f", value: [0., 1., 0., 1.0] },
-                unhovered_stroke  : { type: "4f", value: [0., 1., 0., 1.0] },
-                unhovered_opacity    : {value: 1.0},
+                selected_fill: {type: "4f", value: [1., 0., 0., 1.0]},
+                selected_stroke: {type: "4f", value: [1., 0., 0., 1.0]},
+                selected_opacity: {value: 1.0},
+                unselected_fill: {type: "4f", value: [1., 0., 0., 1.0]},
+                unselected_stroke: {type: "4f", value: [1., 0., 0., 1.0]},
+                unselected_opacity: {value: 1.0},
+                hovered_fill: {type: "4f", value: [0., 1., 0., 1.0]},
+                hovered_opacity: {value: 1.0},
+                hovered_stroke: {type: "4f", value: [0., 1., 0., 1.0]},
+                unhovered_fill: {type: "4f", value: [0., 1., 0., 1.0]},
+                unhovered_stroke: {type: "4f", value: [0., 1., 0., 1.0]},
+                unhovered_opacity: {value: 1.0},
 
                 stroke_color_default: {type: "4f", value: [0, 0, 0, 0]},
 
-                colormap: { type: 't', value: null },
-                fill: {type: 'b', value: true },
-                stroke_width: {type: 'f', value: 1.5 },
-                marker_scale: {type: 'f', value: 1.0 }
+                colormap: {type: 't', value: null},
+                fill: {type: 'b', value: true},
+                stroke_width: {type: 'f', value: 1.5},
+                marker_scale: {type: 'f', value: 1.0}
             },
             vertexShader: require('raw-loader!../shaders/scatter-vertex.glsl'),
             fragmentShader: require('raw-loader!../shaders/scatter-fragment.glsl'),
@@ -166,25 +166,25 @@ export class ScatterGL extends Mark {
         this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(new THREE.PlaneGeometry());
 
         return base_render_promise.then(() => {
-            this.camera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -10000, 10000 );
+            this.camera = new THREE.OrthographicCamera(-1/2, 1/2, 1/2, -1/2, -10000, 10000);
             this.camera.position.z = 10;
             this.scene = new THREE.Scene();
 
             // helper objects to keep track of a set of attributes
-            this.attributes = new GLAttributes([], [], () => 1, 0, [], {})
-            this.attributes_previous = new GLAttributes([], [], () => 1, 0, [], {})
+            this.attributes = new GLAttributes([], [], () => 1, 0, [], {});
+            this.attributes_previous = new GLAttributes([], [], () => 1, 0, [], {});
             // these contain the modified/padded/truncated attributes
             this.attributes_active = null;
             this.attributes_active_previous = null;
-            this.push_array('x')
-            this.push_array('y')
-            this.push_array('rotation')
-            this.push_opacity()
-            this.push_color()
-            this.push_size()
-            this.push_selected()
-            this.update_geometry()
-            this.scene.add(this.mesh)
+            this.push_array('x');
+            this.push_array('y');
+            this.push_array('rotation');
+            this.push_opacity();
+            this.push_color();
+            this.push_size();
+            this.push_selected();
+            this.update_geometry();
+            this.scene.add(this.mesh);
 
             this.create_listeners();
             this.update_scene();
@@ -205,18 +205,18 @@ export class ScatterGL extends Mark {
             else
                 this.attributes_previous.scalar['size'] = this.attributes.scalar['size'] = this.model.get('default_size');
         } else {
-            let type_name = ar ? 'array' : 'scalar' ;
-            let type_prev = typeof this.attributes.array['size'] != 'undefined' ? 'array' : 'scalar' ;
-            delete this.attributes_previous.scalar['size']
-            delete this.attributes_previous.array['size']
+            let type_name = ar ? 'array' : 'scalar';
+            let type_prev = typeof this.attributes.array['size'] != 'undefined' ? 'array' : 'scalar';
+            delete this.attributes_previous.scalar['size'];
+            delete this.attributes_previous.array['size'];
 
-            this.attributes_previous[type_prev]['size'] = this.attributes[type_prev]['size']
-            delete this.attributes[type_prev]['size']
+            this.attributes_previous[type_prev]['size'] = this.attributes[type_prev]['size'];
+            delete this.attributes[type_prev]['size'];
             this.attributes[type_name]['size'] = ar || this.model.get('default_size');
         }
-        this.attributes_previous.compute_length()
-        this.attributes.compute_length()
-        this.push_selected()
+        this.attributes_previous.compute_length();
+        this.attributes.compute_length();
+        this.push_selected();
     }
 
     push_color() {
@@ -225,13 +225,13 @@ export class ScatterGL extends Mark {
         if(!color) {
             let colors = this.model.get('colors');
             if(!colors) {
-                colors = [(this.model.get('unselected_style') || {})['fill'] || 'orange'] ;// TODO: what should the default color be
+                colors = [(this.model.get('unselected_style') || {})['fill'] || 'orange']; // TODO: what should the default color be
             } else {
                 // this.scatter_material.defines['USE_COLORMAP'] = true;
                 let length = colors.length == 1 ? 1 : this.attributes.length;
                 color = new Float32Array(length * 3);
                 _.each(_.range(length), (i) => {
-                    const scatter_color = new THREE.Color(colors[i % colors.length]) // TODO: can be done more efficiently
+                    const scatter_color = new THREE.Color(colors[i % colors.length]); // TODO: can be done more efficiently
                     color[i*3+0] = scatter_color.r;
                     color[i*3+1] = scatter_color.g;
                     color[i*3+2] = scatter_color.b;
@@ -245,17 +245,17 @@ export class ScatterGL extends Mark {
             this.attributes_previous[type_name]['color'] = this.attributes[type_name]['color'] = color;
             type_prev = type_name;
         } else {
-            this.attributes_previous.drop('color')
-            this.attributes_previous[type_prev]['color'] = this.attributes[type_prev]['color']
-            this.attributes.drop('color')
+            this.attributes_previous.drop('color');
+            this.attributes_previous[type_prev]['color'] = this.attributes[type_prev]['color'];
+            this.attributes.drop('color');
             this.attributes[type_name]['color'] = color;
         }
-        this.attributes_previous.compute_length()
-        this.attributes.compute_length()
+        this.attributes_previous.compute_length();
+        this.attributes.compute_length();
         // if it's not a vec3 type, we use a colormap
         this.scatter_material.defines['USE_COLORMAP'] = type_name.indexOf('vec3') == -1;
         this.scatter_material.defines['USE_COLORMAP_PREVIOUS'] = type_prev.indexOf('vec3') == -1;
-        this.push_selected()
+        this.push_selected();
         this.scatter_material.needsUpdate = true;
     }
 
@@ -266,18 +266,17 @@ export class ScatterGL extends Mark {
             let default_opacities = this.model.get('default_opacities');
             if(!default_opacities)
                 default_opacities = [1.];
-            {
-                // this.scatter_material.defines['USE_COLORMAP'] = true;
-                if(default_opacities.length == 1) {
-                    type_name = 'scalar'
-                    value = new Float32Array(default_opacities);
-                } else {
-                    type_name = 'array'
-                    value = new Float32Array(this.attributes.length);
-                    // TODO: instead of a loop, we might be able to do this more efficiently using TypedArray.set ?
-                    for(let i = 0; i < value.length; i++) {
-                        value[i] = default_opacities[i % default_opacities.length]
-                    }
+
+            // this.scatter_material.defines['USE_COLORMAP'] = true;
+            if(default_opacities.length == 1) {
+                type_name = 'scalar';
+                value = new Float32Array(default_opacities);
+            } else {
+                type_name = 'array';
+                value = new Float32Array(this.attributes.length);
+                // TODO: instead of a loop, we might be able to do this more efficiently using TypedArray.set ?
+                for(let i = 0; i < value.length; i++) {
+                    value[i] = default_opacities[i % default_opacities.length];
                 }
             }
         }
@@ -287,14 +286,14 @@ export class ScatterGL extends Mark {
             this.attributes_previous[type_name]['opacity'] = this.attributes[type_name]['opacity'] = value;
             // type_prev = type_name;
         } else {
-            this.attributes_previous.drop('opacity')
-            this.attributes_previous[type_prev]['opacity'] = this.attributes[type_prev]['opacity']
-            this.attributes.drop('opacity')
+            this.attributes_previous.drop('opacity');
+            this.attributes_previous[type_prev]['opacity'] = this.attributes[type_prev]['opacity'];
+            this.attributes.drop('opacity');
             this.attributes[type_name]['opacity'] = value;
         }
-        this.attributes_previous.compute_length()
-        this.attributes.compute_length()
-        this.push_selected()
+        this.attributes_previous.compute_length();
+        this.attributes.compute_length();
+        this.push_selected();
         this.scatter_material.needsUpdate = true;
     }
 
@@ -302,35 +301,35 @@ export class ScatterGL extends Mark {
         let ar = this.model.get(name);
         if(!ar) return;
         this.attributes_previous.array[name] = this.attributes.array[name] || ar;
-        this.attributes.array[name] = ar
-        this.attributes_previous.compute_length()
-        this.attributes.compute_length()
-        this.push_selected()
+        this.attributes.array[name] = ar;
+        this.attributes_previous.compute_length();
+        this.attributes.compute_length();
+        this.push_selected();
     }
 
     push_selected() {
-        const selected = this.model.get('selected')
+        const selected = this.model.get('selected');
         if(this.attributes_active && this.mesh.geometry.attributes.selected) {
             if(selected) {
                 this.scatter_material.uniforms['has_selection'].value = true;
                 let selected_mask = this.mesh.geometry.attributes.selected.array;
-                selected_mask.fill(0)
+                selected_mask.fill(0);
                 for(let i =0; i < selected.length; i++) {
                     if(selected[i] < selected_mask.length)
                         selected_mask[selected[i]] = 1;
                 }
                 this.mesh.geometry.attributes.selected.needsUpdate = true;
                 // this.mesh.geometry.attributes.selected_.needsUpdate = true;
-                this.update_scene()
+                this.update_scene();
                 // return;
             }
 
         }
-        this.attributes.drop('selected')
-        this.attributes_previous.drop('selected')
+        this.attributes.drop('selected');
+        this.attributes_previous.drop('selected');
         // no animation yet, lets shove the max length mask in both
         let length = Math.max(this.attributes.length, this.attributes_previous.length, _.max(selected)+1);
-        let selected_mask = new Uint8Array(length)
+        let selected_mask = new Uint8Array(length);
         if(selected) {
             this.scatter_material.uniforms['has_selection'].value = true;
             for(let i =0; i < selected.length; i++) {
@@ -342,8 +341,8 @@ export class ScatterGL extends Mark {
         }
         this.attributes.array['selected'] = selected_mask;
         this.attributes_previous.array['selected'] = selected_mask;
-        this.attributes_previous.compute_length()
-        this.attributes.compute_length()
+        this.attributes_previous.compute_length();
+        this.attributes.compute_length();
     }
 
     update_geometry(attributes_changed?, finalizers?) {
@@ -358,34 +357,34 @@ export class ScatterGL extends Mark {
         const current_length = this.attributes.length;
 
         // TODO: optimize, there are cases where do don't have to copy, but use the originals
-        this.attributes_active = this.attributes.deepcopy()
-        this.attributes_active_previous = this.attributes_previous.deepcopy()
+        this.attributes_active = this.attributes.deepcopy();
+        this.attributes_active_previous = this.attributes_previous.deepcopy();
         this.attributes_active.trim(this.attributes_active.length);
         this.attributes_active_previous.trim(this.attributes_active_previous.length);
 
         if(this.attributes_active.length != this.attributes_active_previous.length) {
-            this.attributes_active.ensure_array('size')
-            this.attributes_active_previous.ensure_array('size')
+            this.attributes_active.ensure_array('size');
+            this.attributes_active_previous.ensure_array('size');
         }
         if(this.attributes_active.length > this.attributes_active_previous.length) { // grow..
-            this.attributes_active_previous.pad(this.attributes_active)
+            this.attributes_active_previous.pad(this.attributes_active);
             this.attributes_active_previous.array['size'].fill(0, previous_length); // this will make them smoothly fade in
         } else if(this.attributes_active.length < this.attributes_active_previous.length) { // shrink..
-            this.attributes_active.pad(this.attributes_active_previous)
+            this.attributes_active.pad(this.attributes_active_previous);
             this.attributes_active.array['size'].fill(0, current_length); // this will make them smoothly fade out
         }
-        this.attributes_active.add_attributes(this.instanced_geometry)
-        this.attributes_active_previous.add_attributes(this.instanced_geometry, '_previous')
+        this.attributes_active.add_attributes(this.instanced_geometry);
+        this.attributes_active_previous.add_attributes(this.instanced_geometry, '_previous');
 
         if(!this.mesh) {
             this.mesh = new THREE.Mesh(this.instanced_geometry, this.scatter_material);
         }
         else {
-            this.mesh.geometry.dispose()
+            this.mesh.geometry.dispose();
             this.mesh.geometry = this.instanced_geometry;
         }
         _.each(attributes_changed, (key: any) => {
-            const property = "animation_time_" + key
+            const property = "animation_time_" + key;
             const done = () => {
                 // _.each(attributes_changed, (prop) => {
                     delete this.previous_values[key] // may happen multiple times, that is ok
@@ -393,32 +392,32 @@ export class ScatterGL extends Mark {
                 _.each(finalizers, (finalizer: any) => {
                     finalizer()
                 })
-            }
+            };
             // uniforms of material_rgb has a reference to these same object
             const set = (value) => {
-                this.scatter_material.uniforms[property]['value'] = value
+                this.scatter_material.uniforms[property]['value'] = value;
             }
-            this.scatter_material.uniforms[property]['value'] = 0
-            this.transition(set, done, this)
+            this.scatter_material.uniforms[property]['value'] = 0;
+            this.transition(set, done, this);
         })
-        this.attributes_changed = {}
+        this.attributes_changed = {};
 
         this.update_scene();
     }
 
     update_scene() {
-        this.parent.update_gl()
+        this.parent.update_gl();
     }
 
     render_gl() {
-        this.set_ranges()
+        this.set_ranges();
         this._update_requested = false;
         const fig = this.parent;
         this.im.attr('x', 0)
                .attr('y', 0)
                .attr('width', fig.plotarea_width)
-               .attr('height', fig.plotarea_height)
-        this.camera.left = 0
+               .attr('height', fig.plotarea_height);
+        this.camera.left = 0;
         const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
         const y_scale = this.scales.y ? this.scales.y : this.parent.scale_y;
 
@@ -427,24 +426,23 @@ export class ScatterGL extends Mark {
 
         _.each(['selected', 'hovered'], (style_type) => {
             _.each(['stroke', 'fill', 'opacity'], (style_property) => {
-                this.scatter_material.uniforms[`has_${style_type}_${style_property}`].value   = Boolean(this.model.get(`${style_type}_style`)[style_property])
-                this.scatter_material.uniforms[`has_un${style_type}_${style_property}`].value = Boolean(this.model.get(`un${style_type}_style`)[style_property])
+                this.scatter_material.uniforms[`has_${style_type}_${style_property}`].value   = Boolean(this.model.get(`${style_type}_style`)[style_property]);
+                this.scatter_material.uniforms[`has_un${style_type}_${style_property}`].value = Boolean(this.model.get(`un${style_type}_style`)[style_property]);
                 if(_.contains(['opacity'], style_property)) {
-                    this.scatter_material.uniforms[`${style_type}_${style_property}`].value   = this.model.get(`${style_type}_style`)[style_property]
-                    this.scatter_material.uniforms[`un${style_type}_${style_property}`].value = this.model.get(`un${style_type}_style`)[style_property]
+                    this.scatter_material.uniforms[`${style_type}_${style_property}`].value   = this.model.get(`${style_type}_style`)[style_property];
+                    this.scatter_material.uniforms[`un${style_type}_${style_property}`].value = this.model.get(`un${style_type}_style`)[style_property];
                 } else {
-                    this.scatter_material.uniforms[`${style_type}_${style_property}`].value   = color_to_array_rgba(this.model.get(`${style_type}_style`)[style_property], 'green')
-                    this.scatter_material.uniforms[`un${style_type}_${style_property}`].value = color_to_array_rgba(this.model.get(`un${style_type}_style`)[style_property], 'green')
+                    this.scatter_material.uniforms[`${style_type}_${style_property}`].value   = color_to_array_rgba(this.model.get(`${style_type}_style`)[style_property], 'green');
+                    this.scatter_material.uniforms[`un${style_type}_${style_property}`].value = color_to_array_rgba(this.model.get(`un${style_type}_style`)[style_property], 'green');
                 }
-
             })
         })
 
         this.camera.left  = 0;
         this.camera.right = fig.plotarea_width;
-        this.camera.bottom = 0
-        this.camera.top = fig.plotarea_height
-        this.camera.updateProjectionMatrix()
+        this.camera.bottom = 0;
+        this.camera.top = fig.plotarea_height;
+        this.camera.updateProjectionMatrix();
 
         this.scatter_material.uniforms['range_x'].value = range_x;
         this.scatter_material.uniforms['range_y'].value = [range_y[1], range_y[0]]; // flipped coordinates in WebGL
@@ -473,7 +471,7 @@ export class ScatterGL extends Mark {
         const renderer = fig.renderer;
         renderer.render(this.scene, this.camera);
 
-        const transitions_todo = []
+        const transitions_todo = [];
         for(let i = 0; i < this.transitions.length; i++) {
             const t = this.transitions[i];
             if(!t.is_done())
