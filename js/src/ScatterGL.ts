@@ -165,32 +165,9 @@ export class ScatterGL extends Mark {
 
         this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(new THREE.PlaneGeometry());
         this.marker_scale = 1;
-        const sync_marker = () => {
-            this.dot.type(this.model.get("marker"))
-            this.scatter_material.defines['FAST_DRAW'] = 0;
-            const marker = this.model.get('marker');
-            const FAST_CIRCLE = 1;
-            const FAST_SQUARE = 2;
-            const FAST_ARROW = 3;
-            if(marker === 'circle') {
-                // same as in ./Markers.js
-                this.marker_scale = 1/Math.sqrt(Math.PI);
-                this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
-            }
-            if(marker === 'square') {
-                this.marker_scale = 1/2.;
-                this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
-            }
-            if(marker === 'arrow') {
-                this.marker_scale = 2;
-                this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
-            }
-            this.scatter_material.needsUpdate = true;
-            if(this.mesh) // otherwise someone will call it later on
-                this.update_geometry()
-        }
-        sync_marker()
-        this.listenTo(this.model, 'change:marker', sync_marker)
+
+        this.on_marker_change();
+        this.listenTo(this.model, 'change:marker', this.on_marker_change);
 
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -10000, 10000 );
@@ -220,6 +197,30 @@ export class ScatterGL extends Mark {
             });
         });
         return base_render_promise;
+    }
+
+    on_marker_change() {
+        const marker = this.model.get('marker');
+        this.dot.type(marker);
+        const FAST_CIRCLE = 1;
+        const FAST_SQUARE = 2;
+        const FAST_ARROW = 3;
+        if(marker === 'circle') {
+            // same as in ./Markers.js
+            this.marker_scale = 1/Math.sqrt(Math.PI);
+            this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
+        }
+        if(marker === 'square') {
+            this.marker_scale = 1/2.;
+            this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
+        }
+        if(marker === 'arrow') {
+            this.marker_scale = 2;
+            this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
+        }
+        this.scatter_material.needsUpdate = true;
+        if(this.mesh) // otherwise someone will call it later on
+            this.update_geometry();
     }
 
     push_size() {
