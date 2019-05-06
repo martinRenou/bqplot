@@ -65,7 +65,6 @@ export class ScatterGL extends Mark {
         this.attributes_changed = {};
         this.transitions = [];
         this.invalidated_pixel_position = true;
-        this._update_requested = false;
 
         const el = this.d3el || this.el;
 
@@ -411,7 +410,6 @@ export class ScatterGL extends Mark {
 
     render_gl() {
         this.set_ranges();
-        this._update_requested = false;
         const fig = this.parent;
         this.im.attr('x', 0)
                .attr('y', 0)
@@ -899,7 +897,6 @@ export class ScatterGL extends Mark {
     attributes_active: any;
     attributes_active_previous: any;
     attributes_previous: any;
-    _update_requested: any;
 
     model: ScatterGLModel;
 };
