@@ -160,7 +160,8 @@ export class ScatterGL extends Mark {
             blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
         });
 
-        this.buffer_marker_geometry = new THREE.BufferGeometry().fromGeometry(new THREE.PlaneGeometry());
+        // we use a plane (2 triangles) as 'template' for the instanced geometry
+        this.plane_buffer_geometry = new THREE.PlaneBufferGeometry();
 
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera(-1/2, 1/2, 1/2, -1/2, -10000, 10000);
@@ -344,11 +345,16 @@ export class ScatterGL extends Mark {
 
     update_geometry(attributes_changed?, finalizers?) {
         this.instanced_geometry = new THREE.InstancedBufferGeometry();
-        const vertices = this.buffer_marker_geometry.attributes.position.clone();
+
+        // we copy positions and uv from our plane (our 'template')
+        const vertices = this.plane_buffer_geometry.attributes.position.clone();
         this.instanced_geometry.addAttribute('position', vertices);
 
-        const uv = this.buffer_marker_geometry.attributes.uv.clone();
+        const uv = this.plane_buffer_geometry.attributes.uv.clone();
         this.instanced_geometry.addAttribute('uv', uv);
+
+        // also copy the indices that refer to the vertices
+        this.instanced_geometry.index = this.plane_buffer_geometry.index;
 
         const previous_length = this.attributes_previous.length;
         const current_length = this.attributes.length;
@@ -886,7 +892,7 @@ export class ScatterGL extends Mark {
     scene: any;
     mesh: any;
     instanced_geometry: any;
-    buffer_marker_geometry: any;
+    plane_buffer_geometry: any;
     im: any;
     marker_scale: any;
     marker_plane: any;
