@@ -17,7 +17,7 @@ uniform float animation_time_rotation;
 uniform float animation_time_opacity;
 
 #ifdef HAS_DEFAULT_STROKE_COLOR
-uniform vec4 stroke_color_default;
+uniform vec4 default_stroke_color;
 #endif
 
 uniform bool has_selection;
@@ -177,9 +177,9 @@ void main(void) {
     fill_color = color_rgba;
     stroke_color = color_rgba;
 
-    #ifdef HAS_DEFAULT_STROKE_COLOR
-    stroke_color = stroke_color_default;
-    #endif
+#ifdef HAS_DEFAULT_STROKE_COLOR
+    stroke_color = default_stroke_color;
+#endif
 
     float opacity_value = SCALE_OPACITY(mix(opacity_previous, opacity, animation_time_opacity));
     fill_color.a *= opacity_value;
@@ -209,5 +209,5 @@ void main(void) {
 
     // color_rgba = has_selection && has_selected_color ? (selected > 0.5 ? selected_color : unselected_color) : color_rgba;
     gl_Position = projectionMatrix * vec4(rotate_xy(position, angle) * s, 1.0) +
-                  projectionMatrix*modelViewMatrix * vec4(center_pixels + vec3(0., 0., 0.), 1.0);
+                  projectionMatrix * modelViewMatrix * vec4(center_pixels + vec3(0., 0., 0.), 1.0);
 }

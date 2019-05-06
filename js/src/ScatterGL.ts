@@ -135,7 +135,7 @@ export class ScatterGL extends Mark {
                 unhovered_stroke: {type: "4f", value: [0., 1., 0., 1.0]},
                 unhovered_opacity: {value: 1.0},
 
-                stroke_color_default: {type: "4f", value: [0, 0, 0, 0]},
+                default_stroke_color: {type: "4f", value: [0, 0, 0, 0]},
 
                 colormap: {type: 't', value: null},
                 fill: {type: 'b', value: true},
@@ -570,7 +570,7 @@ export class ScatterGL extends Mark {
         const stroke = this.model.get('stroke');
 
         if(stroke) {
-            this.scatter_material.uniforms.stroke_color_default.value = color_to_array_rgba(stroke);
+            this.scatter_material.uniforms.default_stroke_color.value = color_to_array_rgba(stroke);
             this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = true;
         } else {
             this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
