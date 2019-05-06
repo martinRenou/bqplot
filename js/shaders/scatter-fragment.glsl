@@ -41,7 +41,7 @@ vec2 rotate_xy(vec2 x, float angle) {
 float circle(in float radius, in vec2 pixel_position) {
     // This function does not use the ellipse function for optimization purpose
     // Circle equation: x^2 + y^2 = radius^2
-    float d = pow(pixel_position.x, 2.0) + pow(pixel_position.y, 2.0);
+    float d = dot(pixel_position, pixel_position);
     float r1 = pow(radius - SMOOTH_PIXELS, 2.0);
     float r2 = pow(radius + SMOOTH_PIXELS, 2.0);
     return 1.0 - smoothstep(r1, r2, d);
