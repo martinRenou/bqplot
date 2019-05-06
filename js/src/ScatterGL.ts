@@ -699,11 +699,10 @@ export class ScatterGL extends Mark {
     }
 
     initialize_additional_scales() {
-        const color_scale = this.scales.color,
-            size_scale = this.scales.size,
-            opacity_scale = this.scales.opacity,
-            skew_scale = this.scales.skew,
-            rotation_scale = this.scales.rotation;
+        const color_scale = this.scales.color;
+        const size_scale = this.scales.size;
+        const opacity_scale = this.scales.opacity;
+        const rotation_scale = this.scales.rotation;
         // the following handlers are for changes in data that does not
         // impact the position of the elements
         if (color_scale) {
@@ -718,12 +717,6 @@ export class ScatterGL extends Mark {
         if (opacity_scale) {
             this.listenTo(opacity_scale, "domain_changed", () => {
                 this.update_scene();
-            });
-        }
-        if (skew_scale) {
-            this.listenTo(skew_scale, "domain_changed", function() {
-                const animate = true;
-                this.update_default_skew(animate);
             });
         }
         if (rotation_scale) {
