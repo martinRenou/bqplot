@@ -81,8 +81,6 @@ export class ScatterGL extends Mark {
 
         this.scatter_material = new THREE.RawShaderMaterial({
             uniforms: {
-                offset: {type: '3f', value: [0, 0, 0]},
-                scale: {type: '3f', value: [1, 1, 1]},
                 domain_x: {type: "2f", value: [0., 10.]},
                 domain_y: {type: "2f", value: [-12., 12.]},
                 domain_z: {type: "2f", value: [0., 1.]},
