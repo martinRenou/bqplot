@@ -71,12 +71,10 @@ uniform bool fill;
 uniform float stroke_width;
 uniform float marker_scale;
 
-varying vec4 fill_color;
-varying vec4 stroke_color;
-varying vec3 vertex_position;
-varying vec2 vertex_uv;
-varying vec2 vUv;
-varying float marker_size;
+varying vec4 v_fill_color;
+varying vec4 v_stroke_color;
+varying vec2 v_uv;
+varying float v_marker_size;
 
 // #ifdef AS_LINE
 // attribute vec3 position_previous;
@@ -152,10 +150,10 @@ void main(void) {
 
 
     // times 4 because of the normalized coordinates, and radius vs diameter use
-    marker_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
+    v_marker_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
     // we draw larger than the size for the stroke_width (on both side)
-    float s = marker_size + 2.0 * stroke_width;
-    vUv = uv;
+    float s = v_marker_size + 2.0 * stroke_width;
+    v_uv = uv;
     float angle = SCALE_ROTATION(mix(rotation_previous, rotation, animation_time_rotation));
     vec3 model_pos = rotate_xy(position, 1.) * s + center_pixels;
 
@@ -174,38 +172,38 @@ void main(void) {
     // we don't have selected_color_previous, should we?
     // if(selected )
     color_rgba = mix(color_rgba_previous, color_rgba, animation_time_color);
-    fill_color = color_rgba;
-    stroke_color = color_rgba;
+    v_fill_color = color_rgba;
+    v_stroke_color = color_rgba;
 
 #ifdef HAS_DEFAULT_STROKE_COLOR
-    stroke_color = default_stroke_color;
+    v_stroke_color = default_stroke_color;
 #endif
 
     float opacity_value = SCALE_OPACITY(mix(opacity_previous, opacity, animation_time_opacity));
-    fill_color.a *= opacity_value;
-    stroke_color.a *= opacity_value;
+    v_fill_color.a *= opacity_value;
+    v_stroke_color.a *= opacity_value;
 
     if(has_selection) {
         if(has_selected_fill && selected > 0.5 )
-            fill_color = selected_fill;
+            v_fill_color = selected_fill;
         if(has_unselected_fill && selected < 0.5 )
-            fill_color = unselected_fill;
+            v_fill_color = unselected_fill;
         if(has_selected_stroke && selected > 0.5 )
-            stroke_color = selected_stroke;
+            v_stroke_color = selected_stroke;
         if(has_unselected_stroke && selected < 0.5 )
-            stroke_color = unselected_stroke;
+            v_stroke_color = unselected_stroke;
         if(has_selected_opacity && selected > 0.5 ) {
-            stroke_color.a *= selected_opacity;
-            fill_color.a *= selected_opacity;
+            v_stroke_color.a *= selected_opacity;
+            v_fill_color.a *= selected_opacity;
         }
         if(has_unselected_opacity && selected < 0.5 ) {
-            stroke_color.a *= unselected_opacity;
-            fill_color.a *= unselected_opacity;
+            v_stroke_color.a *= unselected_opacity;
+            v_fill_color.a *= unselected_opacity;
         }
     }
 
-    fill_color.rgb *= fill_color.a;
-    stroke_color.rgb *= stroke_color.a;
+    v_fill_color.rgb *= v_fill_color.a;
+    v_stroke_color.rgb *= v_stroke_color.a;
 
     // color_rgba = has_selection && has_selected_color ? (selected > 0.5 ? selected_color : unselected_color) : color_rgba;
     gl_Position = projectionMatrix * vec4(rotate_xy(position, angle) * s, 1.0) +

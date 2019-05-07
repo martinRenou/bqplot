@@ -14,12 +14,10 @@ precision highp int;
 // This parameter is used for reducing aliasing
 #define SMOOTH_PIXELS 1.0
 
-varying vec4 fill_color;
-varying vec4 stroke_color;
-varying vec3 vertex_position;
-varying vec2 vertex_uv;
-varying vec2 vUv;
-varying float marker_size;
+varying vec4 v_fill_color;
+varying vec4 v_stroke_color;
+varying vec2 v_uv;
+varying float v_marker_size;
 
 uniform float stroke_width;
 
@@ -120,12 +118,12 @@ float cross(in vec2 size, in vec2 pixel_position) {
 void main(void) {
     // pixel is the pixel position relatively to the marker,
     // e.g. vec2(0.) would be the center of the square marker
-    // e.g. vec2(marker_size + 2.0 * stroke_width) would be the top-right pixel of the square marker
-    vec2 pixel = (vUv - 0.5) * (marker_size + 2.0 * stroke_width);
+    // e.g. vec2(v_marker_size + 2.0 * stroke_width) would be the top-right pixel of the square marker
+    vec2 pixel = (v_uv - 0.5) * (v_marker_size + 2.0 * stroke_width);
 
     // fill_weight and stroke_weight are color factors
-    // e.g. if fill_weight == 1.0 then the pixel color will be fill_color
-    // e.g. if stroke_weight == 1.0 then the pixel color will be stroke_color
+    // e.g. if fill_weight == 1.0 then the pixel color will be v_fill_color
+    // e.g. if stroke_weight == 1.0 then the pixel color will be v_stroke_color
     float fill_weight = 0.0;
     float stroke_weight = 0.0;
 
@@ -136,8 +134,8 @@ void main(void) {
     // - `A + B`   -> A OR B
     // - `A * B`   -> A AND B
 
-    float inner_size = marker_size / 2.0 - stroke_width;
-    float outer_size = marker_size / 2.0 + stroke_width;
+    float inner_size = v_marker_size / 2.0 - stroke_width;
+    float outer_size = v_marker_size / 2.0 + stroke_width;
 
     float inner_shape = 0.0;
     float outer_shape = 0.0;
@@ -169,7 +167,7 @@ void main(void) {
 #endif
 
     // `inner_shape` is the shape without the stroke, `outer_shape` is the shape with the stroke
-    // note that the stroke is always drawn, only that it has the `fill_color` if stroke is None
+    // note that the stroke is always drawn, only that it has the `v_fill_color` if stroke is None
     fill_weight = inner_shape;
     stroke_weight = (1.0 - inner_shape) * outer_shape;
 
@@ -177,5 +175,5 @@ void main(void) {
     fill_weight = 0.0;
 #endif
 
-    gl_FragColor = fill_color * fill_weight + stroke_color * stroke_weight;
+    gl_FragColor = v_fill_color * fill_weight + v_stroke_color * stroke_weight;
 }
