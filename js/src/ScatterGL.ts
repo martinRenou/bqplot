@@ -550,6 +550,7 @@ export class ScatterGL extends Mark {
         const FAST_CIRCLE = 1;
         const FAST_SQUARE = 2;
         const FAST_ARROW = 3;
+        const FAST_CROSS = 4;
 
         const marker = this.model.get('marker');
         this.dot.type(marker);
@@ -566,6 +567,10 @@ export class ScatterGL extends Mark {
         if(marker === 'arrow') {
             this.scatter_material.uniforms.marker_scale.value = 2.;
             this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
+        }
+        if(marker === 'cross') {
+            this.scatter_material.uniforms.marker_scale.value = 3./(2. * Math.sqrt(5.));
+            this.scatter_material.defines['FAST_DRAW'] = FAST_CROSS;
         }
 
         this.scatter_material.needsUpdate = true;
