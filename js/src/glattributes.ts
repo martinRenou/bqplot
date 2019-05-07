@@ -268,17 +268,17 @@ export class GLAttributes {
         }
         var postfix = postfix || '';
         // set all attributes
-        _.each(this.array, function(array, name) {
+        _.each(this.array, function(array: any, name) {
             //if(name.indexOf("selected") == -1) { // selected attributes should not be send to the shader
                 array = convert(array);
-                var attr = new THREE.InstancedBufferAttribute(array, 1, 1);
+                var attr = new THREE.InstancedBufferAttribute(new Float32Array(array), 1, 1);
                 geometry.addAttribute(name+postfix, attr);
             //}
         }, this);
-        _.each(this.array_vec3, function(array, name: any) {
+        _.each(this.array_vec3, function(array: any, name: any) {
             //if(name.indexOf("selected") == -1) { // selected attributes should not be send to the shader
                 array = convert(array);
-                var attr = new THREE.InstancedBufferAttribute(array, 3, 1);
+                var attr = new THREE.InstancedBufferAttribute(new Float32Array(array), 3, 1);
                 attr.normalized = name.indexOf("color") == -1 ? false : true; // color should be normalized
                 geometry.addAttribute(name+postfix, attr);
             //}
@@ -289,9 +289,9 @@ export class GLAttributes {
                 geometry.addAttribute(name+postfix, attr);
             //}
         }, this);
-        _.each(this.scalar_vec3, function(scalar_vec3, name: any) {
+        _.each(this.scalar_vec3, function(scalar_vec3: any, name: any) {
             //if(name.indexOf("selected") == -1) { // selected attributes should not be send to the shader
-                var attr = new THREE.InstancedBufferAttribute(scalar_vec3, 3, this.length);
+                var attr = new THREE.InstancedBufferAttribute(new Float32Array(scalar_vec3), 3, this.length);
                 attr.normalized = name.indexOf("color") == -1 ? false : true; // color should be normalized
                 geometry.addAttribute(name+postfix, attr);
             //}
