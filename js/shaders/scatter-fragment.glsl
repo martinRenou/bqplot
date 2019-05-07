@@ -137,47 +137,40 @@ void main(void) {
     // - `A + B`   -> A OR B
     // - `A * B`   -> A AND B
 
-#if FAST_DRAW == FAST_CIRCLE
-    float inner_radius = marker_size/2.0 - stroke_width;
-    float outer_radius = marker_size/2.0 + stroke_width;
-
-    float inner_circle = smooth_circle(inner_radius, pixel);
-    float outer_circle = smooth_circle(outer_radius, pixel);
-
-    fill_weight = inner_circle;
-    stroke_weight = (1.0 - inner_circle) * outer_circle;
-
-#elif FAST_DRAW == FAST_SQUARE
-    float inner_square_size = marker_size/2.0 - stroke_width;
-
-    fill_weight = smooth_square(inner_square_size, pixel);
-
-    stroke_weight = 1.0 - fill_weight;
-
-#elif FAST_DRAW == FAST_CROSS
     float inner_size = marker_size/2.0 - stroke_width;
     float outer_size = marker_size/2.0 + stroke_width;
 
-    float inner_cross = cross(vec2(inner_size, inner_size/2.0), pixel);
-    float outer_cross = cross(vec2(outer_size/2.0, outer_size), pixel);
+    float inner_shape = 0.0;
+    float outer_shape = 0.0;
 
-    fill_weight = inner_cross;
-    stroke_weight = (1.0 - inner_cross) * outer_cross;
+#if FAST_DRAW == FAST_CIRCLE
 
+    inner_shape = smooth_circle(inner_size, pixel);
+    outer_shape = smooth_circle(outer_size, pixel);
+
+#elif FAST_DRAW == FAST_SQUARE
+
+    inner_shape = smooth_square(inner_size, pixel);
+    outer_shape = 1.0; // Always in the outer_shape
+
+#elif FAST_DRAW == FAST_CROSS
+
+    inner_shape = cross(vec2(inner_size, inner_size/3.0), pixel);
+    outer_shape = cross(vec2(outer_size/3.0, outer_size), pixel);
 
 #elif FAST_DRAW == FAST_ARROW
+
     float angle = 20. * PI / 180.;
 
-    float inner_height = marker_size/2.0 - stroke_width;
-    float outer_height = marker_size/2.0 + stroke_width;
-
-    float inner_triangle = smooth_isosceles_triangle(angle, inner_height, pixel);
-    float outer_triangle = smooth_isosceles_triangle(angle, outer_height, pixel);
-
-    fill_weight = inner_triangle;
-    stroke_weight = (1.0 - inner_triangle) * outer_triangle;
+    inner_shape = smooth_isosceles_triangle(angle, inner_size, pixel);
+    outer_shape = smooth_isosceles_triangle(angle, outer_size, pixel);
 
 #endif
+
+    // `inner_shape` is the shape without the stroke, `outer_shape` is the shape with the stroke
+    // note that the stroke is always drawn, only that it has the `fill_color` if stroke is None
+    fill_weight = inner_shape;
+    stroke_weight = (1.0 - inner_shape) * outer_shape;
 
     fill_weight *= (fill ? 1.0 : 0.0);
 
