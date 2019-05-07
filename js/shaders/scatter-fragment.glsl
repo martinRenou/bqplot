@@ -137,8 +137,8 @@ void main(void) {
     // - `A + B`   -> A OR B
     // - `A * B`   -> A AND B
 
-    float inner_size = marker_size/2.0 - stroke_width;
-    float outer_size = marker_size/2.0 + stroke_width;
+    float inner_size = marker_size / 2.0 - stroke_width;
+    float outer_size = marker_size / 2.0 + stroke_width;
 
     float inner_shape = 0.0;
     float outer_shape = 0.0;
@@ -155,8 +155,10 @@ void main(void) {
 
 #elif FAST_DRAW == FAST_CROSS
 
-    inner_shape = cross(vec2(inner_size, inner_size/3.0), pixel);
-    outer_shape = cross(vec2(outer_size/3.0, outer_size), pixel);
+    float r = outer_size / 3.0;
+
+    inner_shape = cross(vec2(inner_size, r - 2.0 * stroke_width), pixel);
+    outer_shape = cross(vec2(r, outer_size), pixel);
 
 #elif FAST_DRAW == FAST_ARROW
 
