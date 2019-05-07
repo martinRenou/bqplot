@@ -9,6 +9,7 @@ precision highp int;
 #define FAST_CIRCLE 1
 #define FAST_SQUARE 2
 #define FAST_ARROW 3
+#define FAST_CROSS 4
 
 // This parameter is used for reducing aliasing
 #define SMOOTH_PIXELS 1.0
@@ -38,7 +39,7 @@ vec2 rotate_xy(vec2 x, float angle) {
  * Returns 1.0 if pixel inside of a circle (0.0 otherwise) given the circle radius and the
  * pixel position.
  */
-float circle(in float radius, in vec2 pixel_position) {
+float smooth_circle(in float radius, in vec2 pixel_position) {
     // This function does not use the ellipse function for optimization purpose
     // Circle equation: x^2 + y^2 = radius^2
     float d = dot(pixel_position, pixel_position);
@@ -51,7 +52,7 @@ float circle(in float radius, in vec2 pixel_position) {
  * Returns 1.0 if pixel inside of an ellipse (0.0 otherwise) given the ellipse radius and the
  * pixel position.
  */
-float ellipse(in float a, in float b, in vec2 pixel_position) {
+float smooth_ellipse(in float a, in float b, in vec2 pixel_position) {
     // Ellipse equation: b^2 * x^2 + a^2 * y^2 = a^2 * b^2
     float r_x = pow(a, 2.0);
     float r_y = pow(b, 2.0);
@@ -65,8 +66,17 @@ float ellipse(in float a, in float b, in vec2 pixel_position) {
  * Returns 1.0 if pixel inside of a rectangle (0.0 otherwise) given the rectangle half-size
  * on the x and y axes and the pixel position.
  */
-float rectangle(in vec2 size, in vec2 pixel_position) {
+float smooth_rectangle(in vec2 size, in vec2 pixel_position) {
     vec2 rec = smoothstep(vec2(-SMOOTH_PIXELS), vec2(SMOOTH_PIXELS), size - abs(pixel_position));
+    return rec.x * rec.y;
+}
+
+/*
+ * Returns 1.0 if pixel inside of a rectangle (0.0 otherwise) given the rectangle half-size
+ * on the x and y axes and the pixel position.
+ */
+float rectangle(in vec2 size, in vec2 pixel_position) {
+    vec2 rec = step(0.0, size - abs(pixel_position));
     return rec.x * rec.y;
 }
 
@@ -74,11 +84,11 @@ float rectangle(in vec2 size, in vec2 pixel_position) {
  * Returns 1.0 if pixel inside of a square (0.0 otherwise) given the square half-size
  * and the pixel position.
  */
-float square(in float size, in vec2 pixel_position) {
-    return rectangle(vec2(size), pixel_position);
+float smooth_square(in float size, in vec2 pixel_position) {
+    return smooth_rectangle(vec2(size), pixel_position);
 }
 
-float isosceles_triangle(in float angle, in float height, in vec2 pixel_position) {
+float smooth_isosceles_triangle(in float angle, in float height, in vec2 pixel_position) {
     float half_angle = angle / 2.0;
 
     // The triangle center is on vec2(0.0, -height/3.0)
@@ -94,6 +104,17 @@ float isosceles_triangle(in float angle, in float height, in vec2 pixel_position
     return smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, half_bottom + pixel_left.x) *
            smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, half_bottom - pixel_right.x) *
            smoothstep(-SMOOTH_PIXELS, SMOOTH_PIXELS, translated_pixel.y + half_height);
+}
+
+
+/*
+ * Returns 1.0 if pixel inside of a cross shape (0.0 otherwise) given the cross half-size
+ * on the x and y axes and the pixel position.
+ */
+float cross(in vec2 size, in vec2 pixel_position) {
+    float cross_shape = rectangle(size.xy, pixel_position) +
+                        rectangle(size.yx, pixel_position);
+    return step(1.0, cross_shape); // equivalent of `cross_shape >= 1.0 ? 1.0 : 0.0`;
 }
 
 
@@ -120,8 +141,8 @@ void main(void) {
     float inner_radius = marker_size/2.0 - stroke_width;
     float outer_radius = marker_size/2.0 + stroke_width;
 
-    float inner_circle = circle(inner_radius, pixel);
-    float outer_circle = circle(outer_radius, pixel);
+    float inner_circle = smooth_circle(inner_radius, pixel);
+    float outer_circle = smooth_circle(outer_radius, pixel);
 
     fill_weight = inner_circle;
     stroke_weight = (1.0 - inner_circle) * outer_circle;
@@ -129,9 +150,20 @@ void main(void) {
 #elif FAST_DRAW == FAST_SQUARE
     float inner_square_size = marker_size/2.0 - stroke_width;
 
-    fill_weight = square(inner_square_size, pixel);
+    fill_weight = smooth_square(inner_square_size, pixel);
 
     stroke_weight = 1.0 - fill_weight;
+
+#elif FAST_DRAW == FAST_CROSS
+    float inner_size = marker_size/2.0 - stroke_width;
+    float outer_size = marker_size/2.0 + stroke_width;
+
+    float inner_cross = cross(vec2(inner_size, inner_size/2.0), pixel);
+    float outer_cross = cross(vec2(outer_size/2.0, outer_size), pixel);
+
+    fill_weight = inner_cross;
+    stroke_weight = (1.0 - inner_cross) * outer_cross;
+
 
 #elif FAST_DRAW == FAST_ARROW
     float angle = 20. * PI / 180.;
@@ -139,8 +171,8 @@ void main(void) {
     float inner_height = marker_size/2.0 - stroke_width;
     float outer_height = marker_size/2.0 + stroke_width;
 
-    float inner_triangle = isosceles_triangle(angle, inner_height, pixel);
-    float outer_triangle = isosceles_triangle(angle, outer_height, pixel);
+    float inner_triangle = smooth_isosceles_triangle(angle, inner_height, pixel);
+    float outer_triangle = smooth_isosceles_triangle(angle, outer_height, pixel);
 
     fill_weight = inner_triangle;
     stroke_weight = (1.0 - inner_triangle) * outer_triangle;
