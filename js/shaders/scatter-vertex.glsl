@@ -73,8 +73,9 @@ uniform float marker_scale;
 
 varying vec4 v_fill_color;
 varying vec4 v_stroke_color;
-varying vec2 v_uv;
-varying float v_marker_size;
+varying float v_inner_size;
+varying float v_outer_size;
+varying vec2 v_pixel;
 
 // #ifdef AS_LINE
 // attribute vec3 position_previous;
@@ -150,12 +151,23 @@ void main(void) {
 
 
     // times 4 because of the normalized coordinates, and radius vs diameter use
-    v_marker_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
+    float marker_size = sqrt(mix(SCALE_SIZE(size_previous), SCALE_SIZE(size), animation_time_size)) * marker_scale * 4.;
     // we draw larger than the size for the stroke_width (on both side)
-    float s = v_marker_size + 2.0 * stroke_width;
-    v_uv = uv;
+
+    // `v_inner_size` is the marker "radius" without the stroke, `v_outer_size` is the marker "radius" with the stroke
+    v_inner_size = marker_size * 0.5 - stroke_width;
+    v_outer_size = marker_size * 0.5 + stroke_width;
+
+    // `full_size` is the marker "diameter" with the stroke
+    float full_size = marker_size + 2.0 * stroke_width;
+
+    // `v_pixel` is the pixel position relatively to the marker,
+    // e.g. vec2(0.) would be the center of the square marker
+    // e.g. vec2(0.5 * full_size) would be the top-right pixel of the square marker
+    v_pixel = (uv - 0.5) * (full_size);
+
     float angle = SCALE_ROTATION(mix(rotation_previous, rotation, animation_time_rotation));
-    vec3 model_pos = rotate_xy(position, 1.) * s + center_pixels;
+    vec3 model_pos = rotate_xy(position, 1.) * full_size + center_pixels;
 
 #ifdef USE_COLORMAP
     float color_index = (color - domain_color.x) / (domain_color.y - domain_color.x);
@@ -206,6 +218,6 @@ void main(void) {
     v_stroke_color.rgb *= v_stroke_color.a;
 
     // color_rgba = has_selection && has_selected_color ? (selected > 0.5 ? selected_color : unselected_color) : color_rgba;
-    gl_Position = projectionMatrix * vec4(rotate_xy(position, angle) * s, 1.0) +
+    gl_Position = projectionMatrix * vec4(rotate_xy(position, angle) * full_size, 1.0) +
                   projectionMatrix * modelViewMatrix * vec4(center_pixels + vec3(0., 0., 0.), 1.0);
 }

@@ -16,8 +16,9 @@ precision highp int;
 
 varying vec4 v_fill_color;
 varying vec4 v_stroke_color;
-varying vec2 v_uv;
-varying float v_marker_size;
+varying float v_inner_size;
+varying float v_outer_size;
+varying vec2 v_pixel;
 
 uniform float stroke_width;
 
@@ -116,11 +117,6 @@ float cross(in vec2 size, in vec2 pixel_position) {
 
 
 void main(void) {
-    // pixel is the pixel position relatively to the marker,
-    // e.g. vec2(0.) would be the center of the square marker
-    // e.g. vec2(v_marker_size + 2.0 * stroke_width) would be the top-right pixel of the square marker
-    vec2 pixel = (v_uv - 0.5) * (v_marker_size + 2.0 * stroke_width);
-
     // fill_weight and stroke_weight are color factors
     // e.g. if fill_weight == 1.0 then the pixel color will be v_fill_color
     // e.g. if stroke_weight == 1.0 then the pixel color will be v_stroke_color
@@ -134,35 +130,32 @@ void main(void) {
     // - `A + B`   -> A OR B
     // - `A * B`   -> A AND B
 
-    float inner_size = v_marker_size / 2.0 - stroke_width;
-    float outer_size = v_marker_size / 2.0 + stroke_width;
-
     float inner_shape = 0.0;
     float outer_shape = 0.0;
 
 #if FAST_DRAW == FAST_CIRCLE
 
-    inner_shape = smooth_circle(inner_size, pixel);
-    outer_shape = smooth_circle(outer_size, pixel);
+    inner_shape = smooth_circle(v_inner_size, v_pixel);
+    outer_shape = smooth_circle(v_outer_size, v_pixel);
 
 #elif FAST_DRAW == FAST_SQUARE
 
-    inner_shape = smooth_square(inner_size, pixel);
+    inner_shape = smooth_square(v_inner_size, v_pixel);
     outer_shape = 1.0; // Always in the outer_shape
 
 #elif FAST_DRAW == FAST_CROSS
 
-    float r = outer_size / 3.0;
+    float r = v_outer_size / 3.0;
 
-    inner_shape = cross(vec2(inner_size, r - 2.0 * stroke_width), pixel);
-    outer_shape = cross(vec2(r, outer_size), pixel);
+    inner_shape = cross(vec2(v_inner_size, r - 2.0 * stroke_width), v_pixel);
+    outer_shape = cross(vec2(r, v_outer_size), v_pixel);
 
 #elif FAST_DRAW == FAST_ARROW
 
     float angle = 20. * PI / 180.;
 
-    inner_shape = smooth_isosceles_triangle(angle, inner_size, pixel);
-    outer_shape = smooth_isosceles_triangle(angle, outer_size, pixel);
+    inner_shape = smooth_isosceles_triangle(angle, v_inner_size, v_pixel);
+    outer_shape = smooth_isosceles_triangle(angle, v_outer_size, v_pixel);
 
 #endif
 
