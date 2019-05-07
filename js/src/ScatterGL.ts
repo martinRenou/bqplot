@@ -530,7 +530,8 @@ export class ScatterGL extends Mark {
         sync_visible();
 
         const sync_fill = () => {
-            this.scatter_material.uniforms.fill.value = this.model.get('fill');
+            this.scatter_material.defines['FILL'] = this.model.get('fill') ? 1 : 0;
+            this.scatter_material.needsUpdate = true;
             this.update_scene();
         }
         this.listenTo(this.model, "change:fill", sync_fill);

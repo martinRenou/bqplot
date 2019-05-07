@@ -21,7 +21,6 @@ varying vec2 vertex_uv;
 varying vec2 vUv;
 varying float marker_size;
 
-uniform bool fill;
 uniform float stroke_width;
 
 
@@ -174,7 +173,9 @@ void main(void) {
     fill_weight = inner_shape;
     stroke_weight = (1.0 - inner_shape) * outer_shape;
 
-    fill_weight *= (fill ? 1.0 : 0.0);
+#if !FILL
+    fill_weight = 0.0;
+#endif
 
     gl_FragColor = fill_color * fill_weight + stroke_color * stroke_weight;
 }
