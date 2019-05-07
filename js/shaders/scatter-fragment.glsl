@@ -120,8 +120,8 @@ float cross(in vec2 size, in vec2 pixel_position) {
 
 void main(void) {
     // pixel is the pixel position relatively to the marker,
-    // e.g. vec2(0.) would be the center of the marker
-    // e.g. vec2(marker_size + 2.0 * stroke_width) would be the top-right pixel of the marker
+    // e.g. vec2(0.) would be the center of the square marker
+    // e.g. vec2(marker_size + 2.0 * stroke_width) would be the top-right pixel of the square marker
     vec2 pixel = (vUv - 0.5) * (marker_size + 2.0 * stroke_width);
 
     // fill_weight and stroke_weight are color factors
