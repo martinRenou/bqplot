@@ -62,7 +62,6 @@ export class ScatterGL extends Mark {
         const base_render_promise = super.render();
 
         this.previous_values = {};
-        this.attributes_changed = {};
         this.transitions = [];
         this.invalidated_pixel_position = true;
 
@@ -406,7 +405,6 @@ export class ScatterGL extends Mark {
             this.scatter_material.uniforms[property]['value'] = 0;
             this.transition(set, done, this);
         })
-        this.attributes_changed = {};
 
         this.update_scene();
     }
@@ -914,7 +912,6 @@ export class ScatterGL extends Mark {
     instanced_geometry: any;
     im: any;
     previous_values: any;
-    attributes_changed: any;
     attributes_active: any;
     attributes_active_previous: any;
     attributes_previous: any;
