@@ -64,18 +64,9 @@ export class ScatterGL extends Mark {
         this.transitions = [];
         this.invalidated_pixel_position = true;
 
-        const el = this.d3el || this.el;
-
         // only used for the legend
         this.dot = bqSymbol()
             .type(this.model.get("marker"));
-
-        this.im = el.append("image")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", 200)
-            .attr("height", 200)
-            .attr("preserveAspectRatio", "none");
 
         // Create square geometry (two triangles) for markers
         this.instanced_geometry = new THREE.InstancedBufferGeometry();
@@ -409,10 +400,6 @@ export class ScatterGL extends Mark {
     render_gl() {
         this.set_ranges();
         const fig = this.parent;
-        this.im.attr('x', 0)
-               .attr('y', 0)
-               .attr('width', fig.plotarea_width)
-               .attr('height', fig.plotarea_height);
         const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
         const y_scale = this.scales.y ? this.scales.y : this.parent.scale_y;
 
@@ -900,7 +887,6 @@ export class ScatterGL extends Mark {
     instanced_geometry: any;
     scatter_material: any;
     mesh: any;
-    im: any;
     legend_el: any;
     dot: any;
     attributes_active: any;
