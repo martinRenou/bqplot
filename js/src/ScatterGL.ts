@@ -61,7 +61,6 @@ export class ScatterGL extends Mark {
     render() {
         const base_render_promise = super.render();
 
-        this.previous_values = {};
         this.transitions = [];
         this.invalidated_pixel_position = true;
 
@@ -388,9 +387,6 @@ export class ScatterGL extends Mark {
         _.each(attributes_changed, (key: any) => {
             const property = "animation_time_" + key;
             const done = () => {
-                // _.each(attributes_changed, (prop) => {
-                    delete this.previous_values[key] // may happen multiple times, that is ok
-                // })
                 _.each(finalizers, (finalizer: any) => {
                     finalizer()
                 })
@@ -908,7 +904,6 @@ export class ScatterGL extends Mark {
     im: any;
     legend_el: any;
     dot: any;
-    previous_values: any;
     attributes_active: any;
     attributes_active_previous: any;
     attributes_previous: any;
