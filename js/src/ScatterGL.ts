@@ -160,9 +160,6 @@ export class ScatterGL extends Mark {
             blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
         });
 
-        // we use a plane (2 triangles) as 'template' for the instanced geometry
-        this.plane_buffer_geometry = new THREE.PlaneBufferGeometry();
-
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera(-1/2, 1/2, 1/2, -1/2, -10000, 10000);
             this.camera.position.z = 10;
@@ -347,15 +344,20 @@ export class ScatterGL extends Mark {
     update_geometry(attributes_changed?, finalizers?) {
         this.instanced_geometry = new THREE.InstancedBufferGeometry();
 
-        // we copy positions and uv from our plane (our 'template')
-        const vertices = this.plane_buffer_geometry.attributes.position.clone();
-        this.instanced_geometry.addAttribute('position', vertices);
+        // Plane geometry (two triangles)
+        const vertices = new Float32Array([
+            -0.5,  0.5, 0.,
+             0.5,  0.5, 0.,
+            -0.5, -0.5, 0.,
+             0.5, -0.5, 0.
+        ]);
+        this.instanced_geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-        const uv = this.plane_buffer_geometry.attributes.uv.clone();
-        this.instanced_geometry.addAttribute('uv', uv);
+        const uv = new Float32Array([0., 1., 1., 1., 0., 0., 1., 0.]);
+        this.instanced_geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
 
-        // also copy the indices that refer to the vertices
-        this.instanced_geometry.index = this.plane_buffer_geometry.index;
+        const indices = new Uint16Array([0, 2, 1, 2, 3, 1]);
+        this.instanced_geometry.index = new THREE.Uint16BufferAttribute(indices, 1);
 
         const previous_length = this.attributes_previous.length;
         const current_length = this.attributes.length;
@@ -910,10 +912,7 @@ export class ScatterGL extends Mark {
     scene: any;
     mesh: any;
     instanced_geometry: any;
-    plane_buffer_geometry: any;
     im: any;
-    marker_scale: any;
-    marker_plane: any;
     previous_values: any;
     attributes_changed: any;
     attributes_active: any;
