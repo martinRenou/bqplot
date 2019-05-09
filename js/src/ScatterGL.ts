@@ -78,6 +78,24 @@ export class ScatterGL extends Mark {
             .attr("height", 200)
             .attr("preserveAspectRatio", "none");
 
+        // Create square geometry (two triangles) for markers
+        this.instanced_geometry = new THREE.InstancedBufferGeometry();
+
+        const vertices = new Float32Array([
+            -0.5,  0.5, 0.,
+             0.5,  0.5, 0.,
+            -0.5, -0.5, 0.,
+             0.5, -0.5, 0.
+        ]);
+        this.instanced_geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+        const uv = new Float32Array([0., 1., 1., 1., 0., 0., 1., 0.]);
+        this.instanced_geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+
+        const indices = new Uint16Array([0, 2, 1, 2, 3, 1]);
+        this.instanced_geometry.index = new THREE.Uint16BufferAttribute(indices, 1);
+
+        // Create material for markers
         this.scatter_material = new THREE.RawShaderMaterial({
             uniforms: {
                 domain_x: {type: "2f", value: [0., 10.]},
@@ -158,6 +176,9 @@ export class ScatterGL extends Mark {
             blendSrcAlpha: THREE.OneFactor,
             blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
         });
+
+        // Create mesh
+        this.mesh = new THREE.Mesh(this.instanced_geometry, this.scatter_material);
 
         return base_render_promise.then(() => {
             this.camera = new THREE.OrthographicCamera(-1/2, 1/2, 1/2, -1/2, -10000, 10000);
@@ -341,23 +362,6 @@ export class ScatterGL extends Mark {
     }
 
     update_geometry(attributes_changed?, finalizers?) {
-        this.instanced_geometry = new THREE.InstancedBufferGeometry();
-
-        // Plane geometry (two triangles)
-        const vertices = new Float32Array([
-            -0.5,  0.5, 0.,
-             0.5,  0.5, 0.,
-            -0.5, -0.5, 0.,
-             0.5, -0.5, 0.
-        ]);
-        this.instanced_geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-        const uv = new Float32Array([0., 1., 1., 1., 0., 0., 1., 0.]);
-        this.instanced_geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-
-        const indices = new Uint16Array([0, 2, 1, 2, 3, 1]);
-        this.instanced_geometry.index = new THREE.Uint16BufferAttribute(indices, 1);
-
         const previous_length = this.attributes_previous.length;
         const current_length = this.attributes.length;
 
@@ -381,13 +385,6 @@ export class ScatterGL extends Mark {
         this.attributes_active.add_attributes(this.instanced_geometry);
         this.attributes_active_previous.add_attributes(this.instanced_geometry, '_previous');
 
-        if(!this.mesh) {
-            this.mesh = new THREE.Mesh(this.instanced_geometry, this.scatter_material);
-        }
-        else {
-            this.mesh.geometry.dispose();
-            this.mesh.geometry = this.instanced_geometry;
-        }
         _.each(attributes_changed, (key: any) => {
             const property = "animation_time_" + key;
             const done = () => {
@@ -896,8 +893,6 @@ export class ScatterGL extends Mark {
     set_default_style(indices, elements?) {}
     set_style_on_elements(style, indices, elements?) {}
 
-    legend_el: any;
-    dot: any;
     transitions: any;
     x_scale: any;
     y_scale: any;
@@ -905,12 +900,14 @@ export class ScatterGL extends Mark {
     pixel_y: any;
     trottled_selector_changed: any;
     invalidated_pixel_position: any;
-    scatter_material: any;
     camera: any;
     scene: any;
-    mesh: any;
     instanced_geometry: any;
+    scatter_material: any;
+    mesh: any;
     im: any;
+    legend_el: any;
+    dot: any;
     previous_values: any;
     attributes_active: any;
     attributes_active_previous: any;
