@@ -1,0 +1,3 @@
+pip install -e .
+jupyter nbextension install --py --symlink --sys-prefix bqplot
+jupyter nbextension enable --py --sys-prefix bqplot
