@@ -6,3 +6,5 @@ dependencies:
   - scikit-learn
   - scipy
   - numpy
+  - nodejs=14
+  - yarn=1.22.5
