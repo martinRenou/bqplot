@@ -14,16 +14,16 @@
  */
 
 import * as d3 from 'd3';
-// var d3 =Object.assign({}, require("d3-array"), require("d3-drag"), require("d3-force"), require("d3-selection"));
 const d3GetEvent = function(){return require("d3-selection").event}.bind(this);
 import * as _ from 'underscore';
 import { Mark } from './Mark';
-import { Scale } from './Scale';
 import { GraphModel } from './GraphModel';
 import { applyStyles } from './utils';
 
-export class Graph extends Mark {
-    render() {
+
+export
+class Graph extends Mark {
+    async render() {
         const base_creation_promise = super.render();
 
         this.selected_style = this.model.get("selected_style");
@@ -70,64 +70,59 @@ export class Graph extends Mark {
             .attr("class", "linkarrow")
             .attr("d", "M0,0 L0,6 L9,3 z");
 
-        return base_creation_promise.then(() => {
-            this.event_listeners = {};
-            this.process_interactions();
-            this.create_listeners();
-            this.compute_view_padding();
-            this.draw();
-        });
+        await base_creation_promise;
+
+        this.event_listeners = {};
+        this.process_interactions();
+        this.create_listeners();
+        this.compute_view_padding();
+        this.draw();
     }
 
     set_ranges() {
-        const x_scale = this.scales.x,
-            y_scale = this.scales.y;
-        if (x_scale) {
-            x_scale.set_range(this.parent.padded_range("x", x_scale.model));
+        if (this.scales.x) {
+            this.scales.x.set_range(this.parent.padded_range("x", this.scales.x.model));
         }
-        if (y_scale) {
-            y_scale.set_range(this.parent.padded_range("y", y_scale.model));
+        if (this.scales.y) {
+            this.scales.y.set_range(this.parent.padded_range("y", this.scales.y.model));
         }
     }
 
     set_positional_scales() {
-        this.x_scale = this.scales.x;
-        this.y_scale = this.scales.y;
-
         // If no scale for "x" or "y" is specified, figure scales are used.
-        if (!this.x_scale) {
-            this.x_scale = this.parent.scale_x;
+        if (!this.scales.x) {
+            this.scales.x = this.parent.scale_x;
         }
-        if (!this.y_scale) {
-            this.y_scale = this.parent.scale_y;
+        if (!this.scales.y) {
+            this.scales.y = this.parent.scale_y;
         }
 
-        this.listenTo(this.x_scale, "domain_changed", function() {
+        this.listenTo(this.scales.x, "domain_changed", () => {
             if (!this.model.dirty) {
-                this.update_position(); }
+                this.updatePosition();
+            }
         });
-        this.listenTo(this.y_scale, "domain_changed", function() {
+        this.listenTo(this.scales.y, "domain_changed", () => {
             if (!this.model.dirty) {
-                this.update_position(); }
+                this.updatePosition();
+            }
         });
     }
 
     relayout() {
         this.set_ranges();
-        this.update_position();
+        this.updatePosition();
     }
 
-    update_position() {
-        const x_scale = this.scales.x,
-            y_scale = this.scales.y;
+    private updatePosition() {
         this.set_ranges();
 
-        if (x_scale && y_scale) {
+        if (this.scales.x && this.scales.y) {
             // set x and y positions on mark data manually
             // and redraw the force layout
             this.model.mark_data.forEach(function(d) {
-                d.x = x_scale.scale(d.xval) + x_scale.offset;
-                d.y = y_scale.scale(d.yval) + y_scale.offset;
+                d.x = this.scales.x.scale(d.xval) + this.scales.x.offset;
+                d.y = this.scales.y.scale(d.yval) + this.scales.y.offset;
             });
 
             if (this.force_layout) {
@@ -612,8 +607,6 @@ export class Graph extends Mark {
     unhovered_style: {[key: string]: string};
     hovered_index: number[];
     arrow: d3.Selection<SVGPathElement, any, any, any>;
-    x_scale: Scale;
-    y_scale: Scale;
     force_layout: d3.Simulation<d3.SimulationNodeDatum, any>;
     links: d3.Selection<SVGPathElement, { source: any, target: any, value: number}, HTMLElement, any>;
     nodes: d3.Selection<SVGGElement, any, HTMLElement, any>;
