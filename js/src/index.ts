@@ -88,5 +88,7 @@ export * from './Image';
 export * from './ImageModel';
 export * from './ScatterGL';
 export * from './ScatterGLModel';
+export * from './ScatterREGL';
+export * from './ScatterREGLModel';
 
 export const version = require('../package.json').version;

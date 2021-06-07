@@ -134,50 +134,50 @@ void main(void) {
     float inner_shape = 0.0;
     float outer_shape = 0.0;
 
-#if FAST_DRAW == FAST_CIRCLE
+// #if FAST_DRAW == FAST_CIRCLE
 
     inner_shape = smooth_circle(v_inner_size, v_pixel);
     outer_shape = smooth_circle(v_outer_size, v_pixel);
 
-#elif FAST_DRAW == FAST_SQUARE
+// #elif FAST_DRAW == FAST_SQUARE
 
-    inner_shape = smooth_square(v_inner_size, v_pixel);
-    outer_shape = 1.0; // Always in the outer_shape
+//     inner_shape = smooth_square(v_inner_size, v_pixel);
+//     outer_shape = 1.0; // Always in the outer_shape
 
-#elif FAST_DRAW == FAST_CROSS
+// #elif FAST_DRAW == FAST_CROSS
 
-    float r = v_outer_size / 3.0;
+//     float r = v_outer_size / 3.0;
 
-    inner_shape = cross(vec2(v_inner_size, r - 2.0 * stroke_width), v_pixel);
-    outer_shape = cross(vec2(r, v_outer_size), v_pixel);
+//     inner_shape = cross(vec2(v_inner_size, r - 2.0 * stroke_width), v_pixel);
+//     outer_shape = cross(vec2(r, v_outer_size), v_pixel);
 
-#elif FAST_DRAW == FAST_ARROW
+// #elif FAST_DRAW == FAST_ARROW
 
-    inner_shape = smooth_isosceles_triangle(ANGLE_20, v_inner_size, v_pixel);
-    outer_shape = smooth_isosceles_triangle(ANGLE_20, v_outer_size, v_pixel);
+//     inner_shape = smooth_isosceles_triangle(ANGLE_20, v_inner_size, v_pixel);
+//     outer_shape = smooth_isosceles_triangle(ANGLE_20, v_outer_size, v_pixel);
 
-#elif FAST_DRAW == FAST_TRIANGLE_UP
+// #elif FAST_DRAW == FAST_TRIANGLE_UP
 
-    inner_shape = smooth_isosceles_triangle(ANGLE_60, v_inner_size, v_pixel);
-    outer_shape = smooth_isosceles_triangle(ANGLE_60, v_outer_size, v_pixel);
+//     inner_shape = smooth_isosceles_triangle(ANGLE_60, v_inner_size, v_pixel);
+//     outer_shape = smooth_isosceles_triangle(ANGLE_60, v_outer_size, v_pixel);
 
-#elif FAST_DRAW == FAST_TRIANGLE_DOWN
+// #elif FAST_DRAW == FAST_TRIANGLE_DOWN
 
-    vec2 reversed_pixel = vec2(v_pixel.x, -v_pixel.y);
+//     vec2 reversed_pixel = vec2(v_pixel.x, -v_pixel.y);
 
-    inner_shape = smooth_isosceles_triangle(ANGLE_60, v_inner_size, reversed_pixel);
-    outer_shape = smooth_isosceles_triangle(ANGLE_60, v_outer_size, reversed_pixel);
+//     inner_shape = smooth_isosceles_triangle(ANGLE_60, v_inner_size, reversed_pixel);
+//     outer_shape = smooth_isosceles_triangle(ANGLE_60, v_outer_size, reversed_pixel);
 
-#endif
+// #endif
 
-    // `inner_shape` is the shape without the stroke, `outer_shape` is the shape with the stroke
-    // note that the stroke is always drawn, only that it has the `v_fill_color` if stroke is None
-    fill_weight = inner_shape;
-    stroke_weight = (1.0 - inner_shape) * outer_shape;
+//     // `inner_shape` is the shape without the stroke, `outer_shape` is the shape with the stroke
+//     // note that the stroke is always drawn, only that it has the `v_fill_color` if stroke is None
+//     fill_weight = inner_shape;
+//     stroke_weight = (1.0 - inner_shape) * outer_shape;
 
-#if !FILL
-    fill_weight = 0.0;
-#endif
+// #if !FILL
+//     fill_weight = 0.0;
+// #endif
 
     gl_FragColor = v_fill_color * fill_weight + v_stroke_color * stroke_weight;
 }

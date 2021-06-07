@@ -17,6 +17,7 @@ import * as widgets from '@jupyter-widgets/base';
 import * as d3 from 'd3';
 // var d3 =Object.assign({}, require("d3-selection"), require("d3-selection-multi"));
 import * as _ from 'underscore';
+import regl from 'regl';
 import * as popperreference from './PopperReference';
 import popper from 'popper.js';
 import * as THREE from 'three';
@@ -350,6 +351,17 @@ export class Figure extends widgets.DOMWidgetView {
     if (this.renderer && !this.el.contains(this.renderer.domElement)) {
       this.el.insertBefore(this.renderer.domElement, this.el.childNodes[1]);
     }
+
+    if (!this.reglCanvas) {
+      this.reglCanvas = document.createElement('canvas');
+
+      this.reglContext = regl({canvas: this.reglCanvas, extensions: ['angle_instanced_arrays']})
+    }
+
+    if (this.reglCanvas && !this.el.contains(this.reglCanvas)) {
+      this.el.insertBefore(this.reglCanvas, this.el.childNodes[1]);
+    }
+
     this.layout_webgl_canvas();
   }
 
@@ -823,6 +835,13 @@ export class Figure extends widgets.DOMWidgetView {
       this.renderer.setSize(this.plotarea_width, this.plotarea_height);
       this.update_gl();
     }
+
+    if (this.reglCanvas) {
+      this.reglCanvas.style.left = this.margin.left + 'px';
+      this.reglCanvas.style.top = this.margin.top + 'px';
+      this.reglCanvas.width = this.plotarea_width;
+      this.reglCanvas.height = this.plotarea_height;
+    }
   }
 
   update_legend() {
@@ -1270,6 +1289,8 @@ export class Figure extends widgets.DOMWidgetView {
   popper_reference: popper.ReferenceObject;
   popper: popper;
   renderer: THREE.WebGLRenderer | null;
+  reglCanvas: HTMLCanvasElement;
+  reglContext: regl.Regl;
   scale_x: Scale;
   scale_y: Scale;
   svg: d3.Selection<SVGElement, any, any, any>;

@@ -79,6 +79,7 @@
     "@lumino/widgets": "^1",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
+    "canvas-fit": "^1.5.0",
     "d3": "^5.7.0",
     "d3-selection": "^1",
     "eslint-config-standard": "^16.0.2",
@@ -87,6 +88,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "is-typedarray": "^1.0.0",
     "popper.js": "^1.0.0",
+    "regl": "^2.1.0",
     "three": "^0.91.0",
     "topojson": "^1.6.24",
     "underscore": "^1.8.3"

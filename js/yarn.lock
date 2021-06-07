@@ -2073,6 +2073,13 @@ caniuse-lite@^1.0.30001219:
   version "1.0.30001234"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001234.tgz#8fc2e709e3b0679d7af7f073a1c661155c39b975"
 
+canvas-fit@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/canvas-fit/-/canvas-fit-1.5.0.tgz#ae13be66ade42f5be0e487e345fce30a5e5b5e5f"
+  integrity sha1-rhO+Zq3kL1vg5IfjRfzjCl5bXl8=
+  dependencies:
+    element-size "^1.1.1"
+
 chai@^4.1.2:
   version "4.3.3"
   resolved "https://registry.npmjs.org/chai/-/chai-4.3.3.tgz"
@@ -2897,6 +2904,11 @@ ee-first@1.1.1:
 electron-to-chromium@^1.3.723:
   version "1.3.748"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.748.tgz#16638a8130f407ae5bf2fc168f2173574deb36c5"
+
+element-size@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/element-size/-/element-size-1.1.1.tgz#64e5f159d97121631845bcbaecaf279c39b5e34e"
+  integrity sha1-ZOXxWdlxIWMYRby67K8nnDm1404=
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -5688,6 +5700,11 @@ regjsparser@^0.6.4:
   resolved "https://registry.npmjs.org/regjsparser/-/regjsparser-0.6.7.tgz"
   dependencies:
     jsesc "~0.5.0"
+
+regl@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/regl/-/regl-2.1.0.tgz#7dae71e9ff20f29c4f42f510c70cd92ebb6b657c"
+  integrity sha512-oWUce/aVoEvW5l2V0LK7O5KJMzUSKeiOwFuJehzpSFd43dO5spP9r+sSUfhKtsky4u6MCqWJaRL+abzExynfTg==
 
 repeat-element@^1.1.2:
   version "1.1.3"
