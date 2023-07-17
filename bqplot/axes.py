@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from traitlets import Int, Unicode, Instance, Enum, Dict, Bool
+from traitlets import observe, Int, Unicode, Instance, Enum, Dict, Bool
 from traittypes import Array
 from ipywidgets import Widget, Color, widget_serialization
 
@@ -102,10 +102,8 @@ class Axis(BaseAxis):
         Degrees to rotate tick labels by.
     """
     icon = 'fa-arrows'
-    orientation = Enum(['horizontal', 'vertical'], default_value='horizontal')\
-        .tag(sync=True)
-    side = Enum(['bottom', 'top', 'left', 'right'],
-                allow_none=True, default_value=None).tag(sync=True)
+    orientation = Enum(['horizontal', 'vertical'], default_value='horizontal')
+    side = Enum(['bottom', 'top', 'left', 'right'], default_value='bottom').tag(sync=True)
     label = Unicode().tag(sync=True)
     grid_lines = Enum(['none', 'solid', 'dashed'], default_value='solid')\
         .tag(sync=True)
@@ -132,6 +130,26 @@ class Axis(BaseAxis):
     _model_name = Unicode('AxisModel').tag(sync=True)
     _ipython_display_ = None  # We cannot display an axis outside of a figure.
 
+    @observe('orientation')
+    def _observe_orientation(self, change):
+        orientation = change['new']
+
+        if orientation == 'horizontal' and self.side not in ['bottom', 'top']:
+            self.side = 'bottom'
+
+        if orientation == 'vertical' and self.side not in ['right', 'left']:
+            self.side = 'left'
+
+    @observe('side')
+    def _observe_side(self, change):
+        side = change['new']
+
+        if side in ['left', 'right'] and self.orientation != 'horizontal':
+            self.orientation = 'horizontal'
+
+        if side in ['bottom', 'top'] and self.orientation != 'vertical':
+            self.orientation = 'vertical'
+
 
 @register_axis('bqplot.ColorAxis')
 class ColorAxis(Axis):
@@ -145,11 +163,6 @@ class ColorAxis(Axis):
     scale: ColorScale
         The scale represented by the axis
     """
-    orientation = Enum(['horizontal', 'vertical'],
-                       default_value='horizontal').tag(sync=True)
-    side = Enum(['bottom', 'top', 'left', 'right'],
-                default_value='bottom').tag(sync=True)
-    label = Unicode().tag(sync=True)
     scale = Instance(ColorScale).tag(sync=True, **widget_serialization)
     _view_name = Unicode('ColorAxis').tag(sync=True)
     _model_name = Unicode('ColorAxisModel').tag(sync=True)
